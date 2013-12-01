@@ -40,6 +40,12 @@ class GameWindow < Hasu::Window
       @character.inertia_x!
     end
   end
+
+  def button_up(id)
+    if id == Gosu::GpButton2
+      @character.stop_jump!
+    end
+  end
 end
 
 GameWindow.run

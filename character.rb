@@ -6,8 +6,9 @@ class Character
   ACCELERATION = 0.4
   GRAVITY = 7
   JUMPING_VELOCITY = 15
-  CAN_JUMP_FOR_MS = 100
+  CAN_JUMP_FOR_MS = 10
   X_INIT = 20
+  MAX_JUMPS = 2
 
   def initialize
     @x = X_INIT
@@ -15,6 +16,7 @@ class Character
     @dx = 0.0
     @dy = 0.0
     @ay = 0.0
+    @nb_jumps = 0
     @gravity = -1.0
     @max_speed = 5
     @is_possible_to_jump = true
@@ -35,16 +37,21 @@ class Character
   end
 
   def can_continue_jumping?
-    (Gosu::milliseconds - @begin_jump_at).to_i < CAN_JUMP_FOR_MS
+    (Gosu::milliseconds - @begin_jump_at).to_i < CAN_JUMP_FOR_MS * @dx.abs
   end
 
   def jump!
     unless @begin_jump_at
       @begin_jump_at = Gosu::milliseconds
     end
-    if can_continue_jumping?
+    if can_continue_jumping? && @nb_jumps < MAX_JUMPS
       @dy = JUMPING_VELOCITY
     end
+  end
+
+  def stop_jump!
+    @begin_jump_at = nil
+    @nb_jumps += 1
   end
 
   def ay_total
@@ -55,9 +62,9 @@ class Character
     @dy += ay_total
     @y += @dy
     if @y < 16
+      @nb_jumps = 0
       @y = 16
       @dy = 0
-      @begin_jump_at = nil
     end
   end
 
