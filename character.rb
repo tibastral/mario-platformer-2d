@@ -1,6 +1,4 @@
 class Character
-  attr_reader :x, :y, :dx, :dy, :a_gravity, :ay, :is_jumping
-
   SIZE = 32
   MAX_SPEED = 5
   ACCELERATION = 0.4
@@ -13,8 +11,8 @@ class Character
   def initialize
     @x = X_INIT
     @y = GameWindow::WIDTH / 2
-    @dx = 0.0
-    @dy = 0.0
+    @velocity_x = 0.0
+    @velocity_y = 0.0
     @ay = 0.0
     @nb_jumps = 0
     @gravity = -1.0
@@ -28,7 +26,7 @@ class Character
   def y2; @y + SIZE / 2; end
 
   def move_x!
-    @x += @dx
+    @x += @velocity_x
   end
 
   def move!
@@ -37,7 +35,7 @@ class Character
   end
 
   def can_continue_jumping?
-    (Gosu::milliseconds - @begin_jump_at).to_i < CAN_JUMP_FOR_MS * @dx.abs
+    (Gosu::milliseconds - @begin_jump_at).to_i < CAN_JUMP_FOR_MS * @velocity_x.abs
   end
 
   def jump!
@@ -45,7 +43,7 @@ class Character
       @begin_jump_at = Gosu::milliseconds
     end
     if can_continue_jumping? && @nb_jumps < MAX_JUMPS
-      @dy = JUMPING_VELOCITY
+      @velocity_y = JUMPING_VELOCITY
     end
   end
 
@@ -59,12 +57,12 @@ class Character
   end
 
   def move_y!
-    @dy += ay_total
-    @y += @dy
+    @velocity_y += ay_total
+    @y += @velocity_y
     if @y < 16
       @nb_jumps = 0
       @y = 16
-      @dy = 0
+      @velocity_y = 0
     end
   end
 
@@ -77,15 +75,15 @@ class Character
   end
 
   def inertia_x!
-    @dx /= 1.10
+    @velocity_x /= 1.10
   end
 
   def accelerate!(direction)
-    @dx += direction * ACCELERATION
-    if @dx > @max_speed
-      @dx = @max_speed
-    elsif @dx < -@max_speed
-      @dx = -@max_speed
+    @velocity_x += direction * ACCELERATION
+    if @velocity_x > @max_speed
+      @velocity_x = @max_speed
+    elsif @velocity_x < -@max_speed
+      @velocity_x = -@max_speed
     end
   end
 

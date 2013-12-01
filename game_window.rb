@@ -1,7 +1,3 @@
-require "hasu"
-
-Hasu.load "character.rb"
-
 class GameWindow < Hasu::Window
   WIDTH = 640
   HEIGHT = 480
@@ -12,6 +8,7 @@ class GameWindow < Hasu::Window
 
   def reset
     @character = Character.new
+    # @bricks = [Brick.new(x1: 1, y1: 1, x2: 2, y2: 2)]
   end
 
   def draw
@@ -19,11 +16,14 @@ class GameWindow < Hasu::Window
   end
 
   def update
-    @character.move!
+    if button_down? Gosu::KbEscape
+      close
+    end
     handle_direction
     if button_down? Gosu::GpButton2
       @character.jump!
     end
+    @character.move!
   end
 
   def handle_direction
@@ -47,5 +47,3 @@ class GameWindow < Hasu::Window
     end
   end
 end
-
-GameWindow.run
