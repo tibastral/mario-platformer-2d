@@ -34,8 +34,12 @@ class Character
     move_y!
   end
 
+  def time_since_beginning_of_jump_in_ms
+    (Gosu::milliseconds - @begin_jump_at).to_i
+  end
+
   def can_continue_jumping?
-    (Gosu::milliseconds - @begin_jump_at).to_i < CAN_JUMP_FOR_MS * @velocity_x.abs
+    time_since_beginning_of_jump_in_ms < CAN_JUMP_FOR_MS * @velocity_x.abs
   end
 
   def jump!
@@ -52,12 +56,8 @@ class Character
     @nb_jumps += 1
   end
 
-  def ay_total
-    @ay + @gravity
-  end
-
   def move_y!
-    @velocity_y += ay_total
+    @velocity_y += @gravity
     @y += @velocity_y
     if @y < 16
       @nb_jumps = 0

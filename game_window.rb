@@ -1,18 +1,13 @@
 class GameWindow < Hasu::Window
   WIDTH = 640
   HEIGHT = 480
+  JUMP_BUTTON = Gosu::GpButton2
+  STEROIDS_BUTTON = Gosu::GpButton3
 
   def initialize
     super(WIDTH, HEIGHT, false)
-  end
-
-  def reset
     @character = Character.new
-    # @bricks = [Brick.new(x1: 1, y1: 1, x2: 2, y2: 2)]
-  end
-
-  def draw
-    @character.draw(self)
+    #@bricks = [Brick.new(x1: 1, y1: 1, x2: 2, y2: 2)]
   end
 
   def update
@@ -20,14 +15,14 @@ class GameWindow < Hasu::Window
       close
     end
     handle_direction
-    if button_down? Gosu::GpButton2
+    if button_down? JUMP_BUTTON
       @character.jump!
     end
     @character.move!
   end
 
   def handle_direction
-    if button_down? Gosu::GpButton3
+    if button_down? STEROIDS_BUTTON
       @character.steroidsSpeed!
     else
       @character.normalSpeed!
@@ -42,8 +37,12 @@ class GameWindow < Hasu::Window
   end
 
   def button_up(id)
-    if id == Gosu::GpButton2
+    if id == JUMP_BUTTON
       @character.stop_jump!
     end
+  end
+
+  def draw
+    @character.draw(self)
   end
 end
