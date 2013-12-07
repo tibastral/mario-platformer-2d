@@ -10,10 +10,28 @@ class Character
   MAX_JUMPS = 2
 
   def handle_collision(brick)
-    if y2 > brick.y1 && y1 < brick.y2
-      @y = brick.y2 + SIZE / 2
-      @velocity_y = 0
-      @nb_jumps = 0
+    if y2 > brick.y1 && y1 < brick.y2 && x1 > brick.x1 && x2 < brick.x2
+      min_overlap_y = [(y2 - brick.y1).abs, (y1 - brick.y2).abs].min
+      min_overlap_x = [(x1 - brick.x1).abs, (x2 - brick.x2).abs].min
+
+      if min_overlap_y < min_overlap_x
+        if @velocity_y < 0
+          @velocity_y = 0
+          @y = brick.y2 + SIZE / 2
+          @nb_jumps = 0
+        else
+          @velocity_y = 0
+          @y = brick.y1 - SIZE / 2
+        end
+      else
+        if @velocity_x < 0
+          @x = brick.x2 + SIZE / 2
+          @velocity_x = 0
+        elsif @velocity_x > 0
+          @velocity_x = 0
+          @x = brick.x1 + SIZE / 2
+        end
+      end
     end
   end
 
@@ -26,7 +44,7 @@ class Character
   def initialize(window)
     @x = X_INIT
     @y = Y_INIT
-    @velocity_x = 1.0
+    @velocity_x = 0.1
     @velocity_y = 0.0
     @nb_jumps = 0
     @gravity = -1.0
