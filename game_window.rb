@@ -11,8 +11,9 @@ class GameWindow < Hasu::Window
   def reset
     @character = Character.new(self)
     @bricks = [
-      Brick.new(x1: 0, x2: 1000, y1: 0, y2: 10),
-      Brick.new(x1: 0, x2: 1000, y1: 100, y2: 200)
+      Brick.new(x1: -100, x2: 20, y1: -100, y2: 100),
+      Brick.new(x1: -100, x2: 500, y1: 0, y2: 10),
+      Brick.new(x1: -100, x2: 100, y1: 100, y2: 200)
     ]
   end
 
