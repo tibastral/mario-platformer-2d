@@ -5,19 +5,33 @@ class Character
   GRAVITY = 7
   JUMPING_VELOCITY = 15
   CAN_JUMP_FOR_MS = 10
-  X_INIT = 20
+  X_INIT = 100
+  Y_INIT = 10
   MAX_JUMPS = 2
 
-  def initialize
+  def handle_collision(brick)
+    if y2 > brick.y1 && y1 < brick.y2
+      @y = brick.y2 + SIZE / 2
+      @velocity_y = 0
+      @nb_jumps = 0
+    end
+  end
+
+  def handle_collisions(bricks)
+    bricks.each do |brick|
+      handle_collision(brick)
+    end
+  end
+
+  def initialize(window)
     @x = X_INIT
-    @y = GameWindow::WIDTH / 2
-    @velocity_x = 0.0
+    @y = Y_INIT
+    @velocity_x = 1.0
     @velocity_y = 0.0
-    @ay = 0.0
     @nb_jumps = 0
     @gravity = -1.0
     @max_speed = 5
-    @is_possible_to_jump = true
+    @jump_sound = Gosu::Sample.new(window, "media/jump.wav")
   end
 
   def x1; @x - SIZE / 2; end
@@ -39,11 +53,13 @@ class Character
   end
 
   def can_continue_jumping?
+    puts CAN_JUMP_FOR_MS * @velocity_x.abs
     time_since_beginning_of_jump_in_ms < CAN_JUMP_FOR_MS * @velocity_x.abs
   end
 
   def jump!
     unless @begin_jump_at
+      @jump_sound.play
       @begin_jump_at = Gosu::milliseconds
     end
     if can_continue_jumping? && @nb_jumps < MAX_JUMPS
@@ -59,11 +75,6 @@ class Character
   def move_y!
     @velocity_y += @gravity
     @y += @velocity_y
-    if @y < 16
-      @nb_jumps = 0
-      @y = 16
-      @velocity_y = 0
-    end
   end
 
   def normalSpeed!
@@ -71,7 +82,7 @@ class Character
   end
 
   def steroidsSpeed!
-    @max_speed = 10
+    @max_speed = 100
   end
 
   def inertia_x!

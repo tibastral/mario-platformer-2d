@@ -1,13 +1,27 @@
 class GameWindow < Hasu::Window
   WIDTH = 640
   HEIGHT = 480
-  JUMP_BUTTON = Gosu::GpButton2
-  STEROIDS_BUTTON = Gosu::GpButton3
+  JUMP_BUTTONS = [Gosu::GpButton2, Gosu::KbSpace]
+  STEROIDS_BUTTONS = [Gosu::GpButton3, Gosu::KbLeftShift, Gosu::KbRightShift]
 
   def initialize
     super(WIDTH, HEIGHT, false)
-    @character = Character.new
-    #@bricks = [Brick.new(x1: 1, y1: 1, x2: 2, y2: 2)]
+  end
+
+  def reset
+    @character = Character.new(self)
+    @bricks = [
+      Brick.new(x1: 0, x2: 1000, y1: 0, y2: 10),
+      Brick.new(x1: 0, x2: 1000, y1: 100, y2: 200)
+    ]
+  end
+
+  def buttons_down?(buttons)
+    res = false
+    buttons.each do |button|
+      res = res || button_down?(button)
+    end
+    res
   end
 
   def update
@@ -15,21 +29,23 @@ class GameWindow < Hasu::Window
       close
     end
     handle_direction
-    if button_down? JUMP_BUTTON
+
+    if buttons_down? JUMP_BUTTONS
       @character.jump!
     end
     @character.move!
+    @character.handle_collisions(@bricks)
   end
 
   def handle_direction
-    if button_down? STEROIDS_BUTTON
+    if buttons_down? STEROIDS_BUTTONS
       @character.steroidsSpeed!
     else
       @character.normalSpeed!
     end
-    if button_down? Gosu::GpRight
+    if button_down?(Gosu::GpRight) || button_down?(Gosu::KbRight)
       @character.accelerate!(1)
-    elsif button_down? Gosu::GpLeft
+    elsif button_down?(Gosu::GpLeft) || button_down?(Gosu::KbLeft)
       @character.accelerate!(-1)
     else
       @character.inertia_x!
@@ -37,12 +53,13 @@ class GameWindow < Hasu::Window
   end
 
   def button_up(id)
-    if id == JUMP_BUTTON
+    if JUMP_BUTTONS.include?(id)
       @character.stop_jump!
     end
   end
 
   def draw
     @character.draw(self)
+    @bricks.map{|e| e.draw(self)}
   end
 end
