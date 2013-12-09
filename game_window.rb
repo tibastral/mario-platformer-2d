@@ -1,6 +1,6 @@
 class GameWindow < Hasu::Window
-  WIDTH = 640
-  HEIGHT = 480
+  WIDTH = 1024
+  HEIGHT = 768
   JUMP_BUTTONS = [Gosu::GpButton2, Gosu::KbSpace]
   STEROIDS_BUTTONS = [Gosu::GpButton3, Gosu::KbLeftShift, Gosu::KbRightShift]
 
@@ -11,16 +11,16 @@ class GameWindow < Hasu::Window
   def reset
     @character = Character.new(self)
     @bricks = [
-      Brick.new(x1: -100, x2: 20, y1: -100, y2: 100),
-      Brick.new(x1: -100, x2: 500, y1: 0, y2: 10),
-      Brick.new(x1: -100, x2: 100, y1: 100, y2: 200)
+      Brick.new(x1: -1000, x2: 20, y1: -100, y2: 100),
+      Brick.new(x1: -1000, x2: 5000, y1: 0, y2: 10),
+      Brick.new(x1: -1000, x2: 100, y1: 100, y2: 200)
     ]
   end
 
   def buttons_down?(buttons)
     res = false
     buttons.each do |button|
-      res = res || button_down?(button)
+      res ||= button_down?(button)
     end
     res
   end
