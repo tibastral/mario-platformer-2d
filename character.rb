@@ -40,23 +40,24 @@ class Character
       # min_overlap_x = [(x1 - brick.x1).abs, (x2 - brick.x2).abs].min
       #
       # if min_overlap_y < min_overlap_x
-        if @velocity_y < 0
-          @velocity_y = 0
-          @y = brick.y2 + Y_SIZE / 2
-          @nb_jumps = 0
-        else
-          @velocity_y = 0
-          @y = brick.y1 - Y_SIZE / 2
+
+      if @velocity_y < 0
+        @velocity_y = 0
+        @y = brick.y2 + Y_SIZE / 2
+        @nb_jumps = 0
+      else
+        @velocity_y = 0
+        @y = brick.y1 - Y_SIZE / 2
+      end
+      if y2 > brick.y1 && y1 < brick.y2 && x1 > brick.x1 && x2 < brick.x2
+        if @velocity_x < 0
+          @x = brick.x2 + X_SIZE / 2
+          @velocity_x = 0
+        elsif @velocity_x > 0
+          @velocity_x = 0
+          @x = brick.x1 + X_SIZE / 2
         end
-        if y2 > brick.y1 && y1 < brick.y2 && x1 > brick.x1 && x2 < brick.x2
-          if @velocity_x < 0
-            @x = brick.x2 + X_SIZE / 2
-            @velocity_x = 0
-          elsif @velocity_x > 0
-            @velocity_x = 0
-            @x = brick.x1 + X_SIZE / 2
-          end
-        end
+      end
     end
   end
 
@@ -96,17 +97,18 @@ class Character
   end
 
   def can_continue_jumping?
-    puts CAN_JUMP_FOR_MS * @velocity_x.abs
     time_since_beginning_of_jump_in_ms < CAN_JUMP_FOR_MS * @velocity_x.abs
   end
 
   def jump!
-    unless @begin_jump_at
-      @jump_sound.play
-      @begin_jump_at = Gosu::milliseconds
-    end
-    if can_continue_jumping? && @nb_jumps < MAX_JUMPS
-      @velocity_y = JUMPING_VELOCITY
+    if @nb_jumps < MAX_JUMPS
+      unless @begin_jump_at.present?
+        @jump_sound.play
+        @begin_jump_at = Gosu::milliseconds
+      end
+      if can_continue_jumping?
+        @velocity_y = JUMPING_VELOCITY
+      end
     end
   end
 
@@ -130,15 +132,11 @@ class Character
   end
 
   def steroidsSpeed!
-    @max_speed = 100
+    @max_speed = 10
   end
 
   def inertia_x!
-    if jumping?
-      @velocity_x /= FROTTEMENT_AIR
-    else
-      @velocity_x /= FROTTEMENT_TERRE
-    end
+    @velocity_x /= jumping? ? FROTTEMENT_AIR : FROTTEMENT_TERRE
   end
 
   def accelerate!(direction)
