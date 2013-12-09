@@ -8,6 +8,8 @@ class GameWindow < Hasu::Window
     super(WIDTH, HEIGHT, false)
   end
 
+  attr_accessor :scroll_x
+
   def reset
     @character = Character.new(self)
     @bricks = [
@@ -51,6 +53,7 @@ class GameWindow < Hasu::Window
     else
       @character.inertia_x!
     end
+    @scroll_x = @character.scroll_x
   end
 
   def button_up(id)

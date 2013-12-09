@@ -17,6 +17,11 @@ class Character
   MAX_JUMPS = 2
   FROTTEMENT_TERRE = 1.10
   FROTTEMENT_AIR = 1.0005
+  WINDOW_HALF_SIZE = 512
+
+  def scroll_x
+    WINDOW_HALF_SIZE - x1
+  end
 
   def top_x
     x1
@@ -151,10 +156,10 @@ class Character
   def draw(window)
     color = Gosu::Color::RED
     window.draw_quad(
-      x1, GameWindow::HEIGHT - y1, color,
-      x1, GameWindow::HEIGHT - y2, color,
-      x2, GameWindow::HEIGHT - y2, color,
-      x2, GameWindow::HEIGHT - y1, color,
+      window.scroll_x + x1, GameWindow::HEIGHT - y1, color,
+      window.scroll_x + x1, GameWindow::HEIGHT - y2, color,
+      window.scroll_x + x2, GameWindow::HEIGHT - y2, color,
+      window.scroll_x + x2, GameWindow::HEIGHT - y1, color,
     )
   end
 end
