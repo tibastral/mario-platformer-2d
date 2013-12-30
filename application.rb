@@ -1,7 +1,8 @@
 require ::File.expand_path('config/boot')
 
-Hasu.load "character.rb"
-Hasu.load "brick.rb"
-Hasu.load "game_window.rb"
+Hasu.load "lib/models/character.rb"
+Hasu.load "lib/models/brick.rb"
+Hasu.load "lib/models/game_map.rb"
+Hasu.load "lib/game_window.rb"
 
 GameWindow.run

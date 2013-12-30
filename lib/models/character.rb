@@ -5,6 +5,8 @@ class Object
 end
 
 class Character
+  attr_accessor :x, :y, :velocity_x, :velocity_y
+
   X_SIZE = 16
   Y_SIZE = 32
   MAX_SPEED = 5
@@ -23,56 +25,34 @@ class Character
     WINDOW_HALF_SIZE - x1
   end
 
-  def top_x
-    x1
-  end
-
-  def left_y
-    y1
-  end
-
-  def bottom_x
-    x2
-  end
-
-  def right_y
-    y2
+  def collision?(brick)
+    x2 > brick.x1 && x1 < brick.x2 && y1 < brick.y2 && y2 > brick.y1
   end
 
   def handle_collision(brick)
-    if right_y > brick.left_y && left_y < brick.right_y && x1 > brick.x1 && x2 < brick.x2
-      # min_overlap_y = [(y2 - brick.y1).abs, (y1 - brick.y2).abs].min
-      # min_overlap_x = [(x1 - brick.x1).abs, (x2 - brick.x2).abs].min
-      #
-      # if min_overlap_y < min_overlap_x
+    if collision?(brick)
+      overlap_x = [x2, brick.x2].min - [x1, brick.x1].max
+      overlap_y = [y2, brick.y2].min - [y1, brick.y1].max
 
-      if @velocity_y < 0
+      if overlap_y.abs < overlap_x.abs
         @velocity_y = 0
-        @y = brick.y2 + Y_SIZE / 2
+        @y += overlap_y
         @nb_jumps = 0
       else
-        @velocity_y = 0
-        @y = brick.y1 - Y_SIZE / 2
-      end
-      if y2 > brick.y1 && y1 < brick.y2 && x1 > brick.x1 && x2 < brick.x2
-        if @velocity_x < 0
-          @x = brick.x2 + X_SIZE / 2
-          @velocity_x = 0
-        elsif @velocity_x > 0
-          @velocity_x = 0
-          @x = brick.x1 + X_SIZE / 2
-        end
+        @velocity_x = 0.001
+        @x += overlap_x
       end
     end
   end
 
-  def handle_collisions(bricks)
-    bricks.each do |brick|
+  def handle_collisions
+    @map.bricks.each do |brick|
       handle_collision(brick)
     end
   end
 
-  def initialize(window)
+  def initialize(map)
+    @map = map
     @x = X_INIT
     @y = Y_INIT
     @velocity_x = 0.1
@@ -80,7 +60,6 @@ class Character
     @nb_jumps = 0
     @gravity = GRAVITY
     @max_speed = 5
-    @jump_sound = Gosu::Sample.new(window, "media/jump.wav")
   end
 
   def x1; @x - X_SIZE / 2; end
@@ -95,6 +74,7 @@ class Character
   def move!
     move_x!
     move_y!
+    handle_collisions
   end
 
   def time_since_beginning_of_jump_in_ms
@@ -154,6 +134,8 @@ class Character
   end
 
   def draw(window)
+    @window ||= window
+    @jump_sound = Gosu::Sample.new(window, "media/jump.wav")
     color = Gosu::Color::RED
     window.draw_quad(
       window.scroll_x + x1, GameWindow::HEIGHT - y1, color,

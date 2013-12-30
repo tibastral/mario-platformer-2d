@@ -11,12 +11,18 @@ class GameWindow < Hasu::Window
   attr_accessor :scroll_x
 
   def reset
-    @character = Character.new(self)
+    @map = GameMap.new
     @bricks = [
-      Brick.new(x1: -1000, x2: 20, y1: -100, y2: 100),
-      Brick.new(x1: -1000, x2: 5000, y1: 0, y2: 10),
-      Brick.new(x1: -1000, x2: 100, y1: 100, y2: 200)
+      Brick.new(@map, x1: -1000, x2: 20, y1: -100, y2: 100),
+      Brick.new(@map, x1: -1000, x2: 5000, y1: 0, y2: 10),
+      # Brick.new(@map, x1: -1000, x2: 100, y1: 100, y2: 200)
     ]
+
+    @map.bricks = @bricks
+    @character = Character.new(@map)
+    @character.x = 500
+    @character.y = 19
+    @map.characters << @character
   end
 
   def buttons_down?(buttons)
@@ -37,7 +43,6 @@ class GameWindow < Hasu::Window
       @character.jump!
     end
     @character.move!
-    @character.handle_collisions(@bricks)
   end
 
   def handle_direction

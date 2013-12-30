@@ -1,7 +1,8 @@
 class Brick
   attr_reader :x1, :x2, :y1, :y2
 
-  def initialize(params)
+  def initialize(map, params)
+    @map = map
     @x1 = params[:x1]
     @x2 = params[:x2]
     @y1 = params[:y1]
