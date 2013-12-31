@@ -26,7 +26,10 @@ class Character
   end
 
   def collision?(brick)
-    x2 > brick.x1 && x1 < brick.x2 && y1 < brick.y2 && y2 > brick.y1
+    x2 > brick.x1 &&
+    x1 < brick.x2 &&
+    y1 < brick.y2 &&
+    y2 > brick.y1
   end
 
   def handle_collision(brick)
