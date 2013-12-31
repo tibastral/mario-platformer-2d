@@ -123,16 +123,18 @@ class Character
     @max_speed = 10
   end
 
+  def frottement
+    jumping? ? FROTTEMENT_AIR : FROTTEMENT_TERRE
+  end
+
   def inertia_x!
-    @velocity_x /= jumping? ? FROTTEMENT_AIR : FROTTEMENT_TERRE
+    @velocity_x /= frottement
   end
 
   def accelerate!(direction)
     @velocity_x += direction * ACCELERATION
-    if @velocity_x > @max_speed
-      @velocity_x = @max_speed
-    elsif @velocity_x < -@max_speed
-      @velocity_x = -@max_speed
+    if @velocity_x > @max_speed || @velocity_x < -@max_speed
+      @velocity_x /= frottement
     end
   end
 
