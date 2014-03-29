@@ -9,22 +9,6 @@ class Brick
     @y2 = params[:y2]
   end
 
-  def top_x
-    x1
-  end
-
-  def left_y
-    y1
-  end
-
-  def bottom_x
-    x2
-  end
-
-  def right_y
-    y2
-  end
-
   def draw(window)
     color = Gosu::Color::AQUA
     window.draw_quad(

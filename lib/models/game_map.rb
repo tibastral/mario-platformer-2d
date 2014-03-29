@@ -1,9 +1,15 @@
 class GameMap
-  attr_accessor :characters, :bricks
+  attr_accessor :characters, :bricks, :enemies
 
-  def initialize
+  def initialize(window)
+    @window = window
     @characters = []
     @bricks = []
+    @enemies = []
+  end
+
+  def reset
+    @window.reset
   end
 
   def move!

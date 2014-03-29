@@ -10,6 +10,7 @@ class Character
   X_SIZE = 16
   Y_SIZE = 32
   MAX_SPEED = 5
+  MAX_STEROIDS_SPEED = 10
   ACCELERATION = 0.4
   GRAVITY = -1
   JUMPING_VELOCITY = 15
@@ -20,6 +21,23 @@ class Character
   FROTTEMENT_TERRE = 1.10
   FROTTEMENT_AIR = 1.0005
   WINDOW_HALF_SIZE = 512
+
+  def initialize(map, options={})
+    @map = map
+    @x = options[:x] || X_INIT
+    @y = options[:y] || Y_INIT
+    @main = options[:main]
+    @velocity_x = 0.0
+    @velocity_y = 0.0
+    @nb_jumps = 0
+    @gravity = GRAVITY
+    @max_speed = MAX_SPEED
+  end
+
+  def x1; @x - X_SIZE / 2; end
+  def x2; @x + X_SIZE / 2; end
+  def y1; @y - Y_SIZE / 2; end
+  def y2; @y + Y_SIZE / 2; end
 
   def scroll_x
     WINDOW_HALF_SIZE - x1
@@ -42,9 +60,15 @@ class Character
         @y += overlap_y
         @nb_jumps = 0
       else
-        @velocity_x = 0.001
+        @velocity_x = 0
         @x += overlap_x
       end
+    end
+  end
+
+  def handle_collision_with_enemy(enemy)
+    if collision?(enemy)
+      die!
     end
   end
 
@@ -54,38 +78,43 @@ class Character
     end
   end
 
-  def initialize(map)
-    @map = map
-    @x = X_INIT
-    @y = Y_INIT
-    @velocity_x = 0.1
-    @velocity_y = 0.0
-    @nb_jumps = 0
-    @gravity = GRAVITY
-    @max_speed = 5
+  def handle_collisions_with_enemies
+    @map.enemies.each do |enemy|
+      handle_collision_with_enemy(enemy)
+    end
   end
-
-  def x1; @x - X_SIZE / 2; end
-  def x2; @x + X_SIZE / 2; end
-  def y1; @y - Y_SIZE / 2; end
-  def y2; @y + Y_SIZE / 2; end
 
   def move_x!
     @x += @velocity_x
+  end
+
+  def main_character
+    @main
+  end
+
+  def die!
+    @map.reset
   end
 
   def move!
     move_x!
     move_y!
     handle_collisions
+    if main_character
+      handle_collisions_with_enemies
+    end
   end
 
   def time_since_beginning_of_jump_in_ms
     (Gosu::milliseconds - @begin_jump_at).to_i
   end
 
+  def jump_multiplicator
+    @velocity_x.abs > 0 ? @velocity_x.abs : 0.001
+  end
+
   def can_continue_jumping?
-    time_since_beginning_of_jump_in_ms < CAN_JUMP_FOR_MS * @velocity_x.abs
+    time_since_beginning_of_jump_in_ms < CAN_JUMP_FOR_MS * jump_multiplicator
   end
 
   def jump!
@@ -116,11 +145,11 @@ class Character
   end
 
   def normalSpeed!
-    @max_speed = 5
+    @max_speed = MAX_SPEED
   end
 
   def steroidsSpeed!
-    @max_speed = 10
+    @max_speed = MAX_STEROIDS_SPEED
   end
 
   def frottement
@@ -134,7 +163,7 @@ class Character
   def accelerate!(direction)
     @velocity_x += direction * ACCELERATION
     if @velocity_x > @max_speed || @velocity_x < -@max_speed
-      @velocity_x /= frottement
+      inertia_x!
     end
   end
 
