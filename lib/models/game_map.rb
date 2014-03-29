@@ -1,18 +1,17 @@
 class GameMap
-  attr_accessor :characters, :bricks, :enemies
+  attr_accessor :characters, :bricks, :enemies, :window
 
   def initialize(window)
     @window = window
-    @characters = []
     @bricks = [
       Brick.new(self, x1: -1000, x2: 20, y1: -100, y2: 100),
       Brick.new(self, x1: -1000, x2: 5000, y1: 0, y2: 10)
     ]
     @enemies = [
-      Enemy.new(self, x: 10, y: 30),
-      Enemy.new(self, x: 10, y: 30),
-      Enemy.new(self, x: 10, y: 30),
-      Enemy.new(self, x: 10, y: 30)
+      # Enemy.new(self, x: 10, y: 30),
+      # Enemy.new(self, x: 10, y: 30),
+      # Enemy.new(self, x: 10, y: 30),
+      # Enemy.new(self, x: 10, y: 30)
     ]
     @characters = [
       Character.new(self, x: 500, y: 19, main: true)

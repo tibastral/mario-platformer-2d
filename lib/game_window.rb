@@ -6,9 +6,11 @@ class GameWindow < Hasu::Window
 
   def initialize
     super(WIDTH, HEIGHT, false)
+    @scroll_x = 0
+    @font = Gosu::Font.new(self, Gosu::default_font_name, 20)
   end
 
-  attr_accessor :scroll_x
+  attr_accessor :scroll_x, :font
 
   def reset
     @map = GameMap.new(self)
@@ -32,6 +34,18 @@ class GameWindow < Hasu::Window
     @map.move!
   end
 
+  def button_up(id)
+    if JUMP_BUTTONS.include?(id)
+      @character.stop_jump!
+    end
+  end
+
+  def draw
+    @map.draw(self)
+  end
+
+  private
+
   def handle_quit
     if button_down? Gosu::KbEscape
       close
@@ -44,9 +58,9 @@ class GameWindow < Hasu::Window
     else
       @character.normalSpeed!
     end
-    if button_down?(Gosu::GpRight) || button_down?(Gosu::KbRight)
+    if buttons_down? [Gosu::GpRight, Gosu::KbRight]
       @character.accelerate!(1)
-    elsif button_down?(Gosu::GpLeft) || button_down?(Gosu::KbLeft)
+    elsif buttons_down? [Gosu::GpLeft, Gosu::KbLeft]
       @character.accelerate!(-1)
     else
       @character.inertia_x!
@@ -54,13 +68,4 @@ class GameWindow < Hasu::Window
     @scroll_x = @character.scroll_x
   end
 
-  def button_up(id)
-    if JUMP_BUTTONS.include?(id)
-      @character.stop_jump!
-    end
-  end
-
-  def draw
-    @map.draw(self)
-  end
 end

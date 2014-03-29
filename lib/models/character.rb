@@ -52,6 +52,7 @@ class Character
 
   def handle_collision(brick)
     if collision?(brick)
+      @collision = true
       overlap_x = [x2, brick.x2].min - [x1, brick.x1].max
       overlap_y = [y2, brick.y2].min - [y1, brick.y1].max
 
@@ -73,6 +74,7 @@ class Character
   end
 
   def handle_collisions
+    @collision = false
     @map.bricks.each do |brick|
       handle_collision(brick)
     end
@@ -165,9 +167,13 @@ class Character
 
   def accelerate!(direction)
     @velocity_x += direction * ACCELERATION
-    if @velocity_x > @max_speed || @velocity_x < -@max_speed
+    if @velocity_x.abs > @max_speed
       inertia_x!
     end
+  end
+
+  def draw_collision
+    @map.window.font.draw("Collision", 10, 10, -10000)
   end
 
   def draw(window)
@@ -178,7 +184,10 @@ class Character
       window.scroll_x + x1, GameWindow::HEIGHT - y1, color,
       window.scroll_x + x1, GameWindow::HEIGHT - y2, color,
       window.scroll_x + x2, GameWindow::HEIGHT - y2, color,
-      window.scroll_x + x2, GameWindow::HEIGHT - y1, color,
+      window.scroll_x + x2, GameWindow::HEIGHT - y1, color
     )
+    if @collision
+      draw_collision
+    end
   end
 end
