@@ -19,6 +19,9 @@ class GameWindow < Hasu::Window
     ]
 
     @enemies = [
+      Enemy.new(@map, x: 10, y: 30),
+      Enemy.new(@map, x: 10, y: 30),
+      Enemy.new(@map, x: 10, y: 30),
       Enemy.new(@map, x: 10, y: 30)
     ]
 
