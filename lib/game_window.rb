@@ -12,23 +12,7 @@ class GameWindow < Hasu::Window
 
   def reset
     @map = GameMap.new(self)
-    @bricks = [
-      Brick.new(@map, x1: -1000, x2: 20, y1: -100, y2: 100),
-      Brick.new(@map, x1: -1000, x2: 5000, y1: 0, y2: 10),
-      # Brick.new(@map, x1: -1000, x2: 100, y1: 100, y2: 200)
-    ]
-
-    @enemies = [
-      Enemy.new(@map, x: 10, y: 30),
-      Enemy.new(@map, x: 10, y: 30),
-      Enemy.new(@map, x: 10, y: 30),
-      Enemy.new(@map, x: 10, y: 30)
-    ]
-
-    @map.bricks = @bricks
-    @map.enemies = @enemies
-    @character = Character.new(@map, x: 500, y: 19, main: true)
-    @map.characters << @character
+    @character = @map.characters.first
   end
 
   def buttons_down?(buttons)
@@ -45,15 +29,7 @@ class GameWindow < Hasu::Window
     if buttons_down? JUMP_BUTTONS
       @character.jump!
     end
-    @character.move!
-    move_enemies
-  end
-
-  def move_enemies
-    @enemies.each do |enemy|
-      enemy.ai!
-      enemy.move!
-    end
+    @map.move!
   end
 
   def handle_quit
@@ -85,8 +61,6 @@ class GameWindow < Hasu::Window
   end
 
   def draw
-    @character.draw(self)
-    @bricks.map{|e| e.draw(self)}
-    @enemies.map{|e| e.draw(self)}
+    @map.draw(self)
   end
 end
