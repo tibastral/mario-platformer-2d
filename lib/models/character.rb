@@ -142,6 +142,9 @@ class Character
   def move_y!
     @velocity_y += @gravity
     @y += @velocity_y
+    if @y < -1000
+      die!
+    end
   end
 
   def normalSpeed!
