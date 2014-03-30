@@ -5,7 +5,10 @@ class GameMap
     @window = window
     @bricks = [
       Brick.new(self, x1: -1000, x2: 20, y1: -100, y2: 100),
-      Brick.new(self, x1: -1000, x2: 5000, y1: 0, y2: 10)
+      Brick.new(self, x1: -1000, x2: 5000, y1: 0, y2: 10),
+      Brick.new(self, x1: -1000, x2:-500, y1:0, y2:500),
+      Brick.new(self, x1: 100, x2: 1000, y1: 100, y2: 520),
+      Brick.new(self, x1: 500, x2: 520, y1: 120, y2: 300)
     ]
     @enemies = [
       # Enemy.new(self, x: 10, y: 30),
