@@ -11,13 +11,13 @@ class GameMap
       Brick.new(self, x1: 500, x2: 520, y1: 120, y2: 300)
     ]
     @enemies = [
-      # Enemy.new(self, x: 10, y: 30),
-      # Enemy.new(self, x: 10, y: 30),
+      Enemy.new(self, x: 50, y: 200, life: 1),
+      Enemy.new(self, x: 10, y: 200, life: 1),
       # Enemy.new(self, x: 10, y: 30),
       # Enemy.new(self, x: 10, y: 30)
     ]
     @characters = [
-      Character.new(self, x: 500, y: 19, main: true)
+      MainCharacter.new(self, x: 500, y: 26, life: 3)
     ]
   end
 
@@ -28,6 +28,7 @@ class GameMap
   def move!
     @characters.map(&:move!)
     move_enemies!
+    @enemies = @enemies.reject{ |e| e.dead? }
   end
 
   def move_enemies!
