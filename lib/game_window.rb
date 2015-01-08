@@ -51,7 +51,7 @@ class GameWindow < Hasu::Window
       close
     end
   end
-    
+
   def handle_direction
     if buttons_down? STEROIDS_BUTTONS
       @character.steroidsSpeed!

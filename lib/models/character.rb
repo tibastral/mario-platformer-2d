@@ -5,7 +5,7 @@ class Object
 end
 
 class Character
-    attr_accessor :x, :y, :velocity_x, :velocity_y
+  attr_accessor :x, :y, :velocity_x, :velocity_y
 
   X_SIZE = 16
   Y_SIZE = 32
@@ -13,9 +13,9 @@ class Character
   MAX_STEROIDS_SPEED = 10
   MAX_JUMP_MULTIPLICATOR = 1.5
   ACCELERATION = 0.4
-  GRAVITY = -1 
+  GRAVITY = -1
   JUMPING_VELOCITY = 15
-  CAN_JUMP_FOR_MS = 100
+  CAN_JUMP_FOR_MS = 10
   X_INIT = 100
   Y_INIT = 10
   MAX_JUMPS = 2
