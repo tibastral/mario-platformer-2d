@@ -11,6 +11,7 @@ class Character
   Y_SIZE = 32
   MAX_SPEED = 5
   MAX_STEROIDS_SPEED = 10
+  MAX_JUMP_MULTIPLICATOR = 1.5
   ACCELERATION = 0.4
   GRAVITY = -1
   JUMPING_VELOCITY = 15
@@ -26,12 +27,14 @@ class Character
     @map = map
     @x = options[:x] || X_INIT
     @y = options[:y] || Y_INIT
-    @main = options[:main]
+    @previous_x = nil
+    @previous_y = nil
     @velocity_x = 0.0
     @velocity_y = 0.0
     @nb_jumps = 0
     @gravity = GRAVITY
-    @max_speed = MAX_SPEED
+    @life = options[:life]
+    @dead = false
   end
 
   def x1; @x - X_SIZE / 2; end
@@ -39,50 +42,58 @@ class Character
   def y1; @y - Y_SIZE / 2; end
   def y2; @y + Y_SIZE / 2; end
 
+  def previous_x1; @previous_x - X_SIZE / 2; end
+  def previous_x2; @previous_x + X_SIZE / 2; end
+  def previous_y1; @previous_y - Y_SIZE / 2; end
+  def previous_y2; @previous_y + Y_SIZE / 2; end
+
   def scroll_x
     WINDOW_HALF_SIZE - x1
   end
 
-  def collision?(brick)
-    x2 > brick.x1 &&
-    x1 < brick.x2 &&
-    y1 < brick.y2 &&
-    y2 > brick.y1
+  def collision?(object)
+    x2 > object.x1 && 
+    x1 < object.x2 &&
+    y1 < object.y2 && 
+    y2 > object.y1
   end
-
-  def handle_collision(brick)
-    if collision?(brick)
-      @collision = true
-      overlap_x = [x2, brick.x2].min - [x1, brick.x1].max
-      overlap_y = [y2, brick.y2].min - [y1, brick.y1].max
-
-      if overlap_y.abs < overlap_x.abs
-        @velocity_y = 0
-        @y += overlap_y
+    
+  def handle_collision_with_brick!(brick, options={})
+    if collision?(brick)      
+      came_from_up     = previous_y1 >= brick.y2
+      came_from_down   = previous_y2 <= brick.y1
+      came_from_right  = previous_x1 >= brick.x2
+      came_from_left   = previous_x2 <= brick.x1
+      
+      rebound_speed = options[:rebound_speed] || 0
+             
+      if came_from_up
         @nb_jumps = 0
-      else
-        @velocity_x = 0
-        @x += overlap_x
+        move_out_of!(brick, :up)
+        @velocity_y = 0
       end
+    
+      if came_from_down
+        move_out_of!(brick, :down)
+        @velocity_y = 0
+      end        
+        
+      if came_from_right
+        move_out_of!(brick, :right)
+        @velocity_x = rebound_speed
+      end
+        
+      if came_from_left
+        move_out_of!(brick, :left)
+        @velocity_x = -rebound_speed 
+      end  
+        
     end
   end
 
-  def handle_collision_with_enemy(enemy)
-    if collision?(enemy)
-      die!
-    end
-  end
-
-  def handle_collisions
-    @collision = false
+  def handle_collisions_with_bricks!
     @map.bricks.each do |brick|
-      handle_collision(brick)
-    end
-  end
-
-  def handle_collisions_with_enemies
-    @map.enemies.each do |enemy|
-      handle_collision_with_enemy(enemy)
+      handle_collision_with_brick!(brick)
     end
   end
 
@@ -90,21 +101,41 @@ class Character
     @x += @velocity_x
   end
 
-  def main_character
-    @main
-  end
-
-  def die!
-    @map.reset
-  end
-
   def move!
+    @previous_x = @x
+    @previous_y = @y
     move_x!
     move_y!
-    handle_collisions
-    if main_character
-      handle_collisions_with_enemies
+    handle_collisions_with_bricks!
+  end
+    
+  def can_move_out_of?(object, side)
+    tmp_character = Character.new(nil, x: @x, y: @y)  
+    tmp_character.move_out_of!(object, side)
+      
+    collision_detected = @map.bricks.reduce(false) { | c, brick |
+      c || tmp_character.collision?(brick)
+    }
+      
+    return !collision_detected
+  end
+
+  def move_out_of!(object, side)
+      if side == :up
+      @y = object.y2 + Y_SIZE / 2
     end
+  
+      if side == :down
+      @y = object.y1 - Y_SIZE / 2
+    end        
+  
+      if side == :right
+      @x = object.x2 + X_SIZE / 2
+    end
+  
+      if side == :left
+      @x = object.x1 - X_SIZE / 2
+    end  
   end
 
   def time_since_beginning_of_jump_in_ms
@@ -112,7 +143,7 @@ class Character
   end
 
   def jump_multiplicator
-    @velocity_x.abs > 0 ? @velocity_x.abs : 0.001
+    @velocity_x.abs > MAX_JUMP_MULTIPLICATOR ? MAX_JUMP_MULTIPLICATOR : [@velocity_x.abs, 0.001].max
   end
 
   def can_continue_jumping?
@@ -131,7 +162,6 @@ class Character
     end
   end
 
-
   def jumping?
     @velocity_y.abs > 0
   end
@@ -149,6 +179,17 @@ class Character
     end
   end
 
+  def die!
+    @life = @life - 1
+    if @life == 0
+      @dead = true
+    end
+  end
+
+  def dead?
+    @dead
+  end
+    
   def normalSpeed!
     @max_speed = MAX_SPEED
   end
@@ -172,22 +213,14 @@ class Character
     end
   end
 
-  def draw_collision
-    @map.window.font.draw("Collision", 10, 10, -10000)
-  end
-
   def draw(window)
     @window ||= window
     @jump_sound = Gosu::Sample.new(window, "media/jump.wav")
-    color = Gosu::Color::RED
     window.draw_quad(
-      window.scroll_x + x1, GameWindow::HEIGHT - y1, color,
-      window.scroll_x + x1, GameWindow::HEIGHT - y2, color,
-      window.scroll_x + x2, GameWindow::HEIGHT - y2, color,
-      window.scroll_x + x2, GameWindow::HEIGHT - y1, color
+      window.scroll_x + x1, GameWindow::HEIGHT - y1, @color,
+      window.scroll_x + x1, GameWindow::HEIGHT - y2, @color,
+      window.scroll_x + x2, GameWindow::HEIGHT - y2, @color,
+      window.scroll_x + x2, GameWindow::HEIGHT - y1, @color
     )
-    if @collision
-      draw_collision
-    end
   end
 end
