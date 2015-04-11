@@ -15,7 +15,7 @@ class Character
   ACCELERATION = 0.4
   GRAVITY = -1
   JUMPING_VELOCITY = 15
-  CAN_JUMP_FOR_MS = 10
+  CAN_JUMP_FOR_MS = 50
   X_INIT = 100
   Y_INIT = 10
   MAX_JUMPS = 2
@@ -52,42 +52,42 @@ class Character
   end
 
   def collision?(object)
-    x2 > object.x1 && 
+    x2 > object.x1 &&
     x1 < object.x2 &&
-    y1 < object.y2 && 
+    y1 < object.y2 &&
     y2 > object.y1
   end
-    
+
   def handle_collision_with_brick!(brick, options={})
-    if collision?(brick)      
+    if collision?(brick)
       came_from_up     = previous_y1 >= brick.y2
       came_from_down   = previous_y2 <= brick.y1
       came_from_right  = previous_x1 >= brick.x2
       came_from_left   = previous_x2 <= brick.x1
-      
+
       rebound_speed = options[:rebound_speed] || 0
-             
+
       if came_from_up
         @nb_jumps = 0
         move_out_of!(brick, :up)
         @velocity_y = 0
       end
-    
+
       if came_from_down
         move_out_of!(brick, :down)
         @velocity_y = 0
-      end        
-        
+      end
+
       if came_from_right
         move_out_of!(brick, :right)
         @velocity_x = rebound_speed
       end
-        
+
       if came_from_left
         move_out_of!(brick, :left)
-        @velocity_x = -rebound_speed 
-      end  
-        
+        @velocity_x = -rebound_speed
+      end
+
     end
   end
 
@@ -108,15 +108,15 @@ class Character
     move_y!
     handle_collisions_with_bricks!
   end
-    
+
   def can_move_out_of?(object, side)
-    tmp_character = Character.new(nil, x: @x, y: @y)  
+    tmp_character = Character.new(nil, x: @x, y: @y)
     tmp_character.move_out_of!(object, side)
-      
+
     collision_detected = @map.bricks.reduce(false) { | c, brick |
       c || tmp_character.collision?(brick)
     }
-      
+
     return !collision_detected
   end
 
@@ -124,18 +124,18 @@ class Character
       if side == :up
       @y = object.y2 + Y_SIZE / 2
     end
-  
+
       if side == :down
       @y = object.y1 - Y_SIZE / 2
-    end        
-  
+    end
+
       if side == :right
       @x = object.x2 + X_SIZE / 2
     end
-  
+
       if side == :left
       @x = object.x1 - X_SIZE / 2
-    end  
+    end
   end
 
   def time_since_beginning_of_jump_in_ms
@@ -189,7 +189,7 @@ class Character
   def dead?
     @dead
   end
-    
+
   def normalSpeed!
     @max_speed = MAX_SPEED
   end
