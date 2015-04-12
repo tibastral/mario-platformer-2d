@@ -2,7 +2,7 @@ class Enemy < Character
   def initialize(map, options)
     super(map, options)
     @max_speed = 1
-    @color = Gosu::Color::BLUE
+    @color ||= Gosu::Color::BLUE
   end
 
   def ai!

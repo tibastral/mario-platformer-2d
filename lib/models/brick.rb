@@ -10,7 +10,7 @@ class Brick
   end
 
   def draw(window)
-    color = Gosu::Color::AQUA
+    color ||= Gosu::Color::AQUA
     window.draw_quad(
       window.scroll_x + x1, GameWindow::HEIGHT - y1, color,
       window.scroll_x + x1, GameWindow::HEIGHT - y2, color,

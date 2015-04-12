@@ -219,17 +219,17 @@ class Character
 
   def draw(window)
     @window ||= window
-    @jump_sound = Gosu::Sample.new(window, "media/jump.wav")
-    @tileset = Gosu::Image.load_tiles(window, 'media/main_character.png', 16, 16, false)
-    @sprites = {
-      :walking => @tileset.first(3),
-      :standing => @tileset[3]
+    @jump_sound ||= Gosu::Sample.new(window, "media/jump.wav")
+    @tileset ||= Gosu::Image.load_tiles(window, 'media/main_character.png', 32, 32, true)
+    @sprites ||= {
+      walking: @tileset.first(3),
+      standing: @tileset[3]
     }
 
     if moving?
-      @sprites[:walking][rand(3)].draw(scroll_x + x1, GameWindow::HEIGHT - y1, 16, 16)
+      @sprites[:walking][rand(3)].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1, 1, 5, 5)
     else
-      @sprites[:standing].draw(scroll_x + x1, GameWindow::HEIGHT - y1, 16, 16)
+      @sprites[:standing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1, 1, 5, 5)
     end
   end
 end
