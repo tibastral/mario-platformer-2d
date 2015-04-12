@@ -227,7 +227,7 @@ class Character
     }
 
     if moving?
-      @sprites[:walking][rand(3)].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1, 1, 5, 5)
+      @sprites[:walking][rand(3)].draw(window.scroll_x + x1 - 32, GameWindow::HEIGHT - y1 - 128, 1, 5, 5)
     else
       @sprites[:standing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1, 1, 5, 5)
     end
