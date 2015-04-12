@@ -21,7 +21,7 @@ class Character
   MAX_JUMPS = 2
   FROTTEMENT_TERRE = 1.10
   FROTTEMENT_AIR = 1.0005
-  WINDOW_HALF_SIZE = 512
+  WINDOW_HALF_SIZE = 256
 
   def initialize(map, options={})
     @map = map
@@ -110,7 +110,7 @@ class Character
   end
 
   def moving?
-    @velotcity_x != 0
+    @velocity_x.abs > 0.1
   end
 
   def can_move_out_of?(object, side)
@@ -220,16 +220,16 @@ class Character
   def draw(window)
     @window ||= window
     @jump_sound ||= Gosu::Sample.new(window, "media/jump.wav")
-    @tileset ||= Gosu::Image.load_tiles(window, 'media/main_character.png', 32, 32, true)
+    @tileset ||= Gosu::Image.load_tiles(window, 'media/mario_try.png', 7, 20, true)
     @sprites ||= {
       walking: @tileset.first(3),
       standing: @tileset[3]
     }
 
     if moving?
-      @sprites[:walking][rand(3)].draw(window.scroll_x + x1 - 32, GameWindow::HEIGHT - y1 - 128, 1, 5, 5)
+      @sprites[:walking][rand(3)].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - 100, 1, 5, 5)
     else
-      @sprites[:standing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1, 1, 5, 5)
+      @sprites[:standing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - 100, 1, 5, 5)
     end
   end
 end
