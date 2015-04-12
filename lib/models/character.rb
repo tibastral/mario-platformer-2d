@@ -109,6 +109,10 @@ class Character
     handle_collisions_with_bricks!
   end
 
+  def moving?
+    @velotcity_x != 0
+  end
+
   def can_move_out_of?(object, side)
     tmp_character = Character.new(nil, x: @x, y: @y)
     tmp_character.move_out_of!(object, side)
@@ -216,11 +220,16 @@ class Character
   def draw(window)
     @window ||= window
     @jump_sound = Gosu::Sample.new(window, "media/jump.wav")
-    window.draw_quad(
-      window.scroll_x + x1, GameWindow::HEIGHT - y1, @color,
-      window.scroll_x + x1, GameWindow::HEIGHT - y2, @color,
-      window.scroll_x + x2, GameWindow::HEIGHT - y2, @color,
-      window.scroll_x + x2, GameWindow::HEIGHT - y1, @color
-    )
+    @tileset = Gosu::Image.load_tiles(window, 'media/main_character.png', 16, 16, false)
+    @sprites = {
+      :walking => @tileset.first(3),
+      :standing => @tileset[3]
+    }
+
+    if moving?
+      @sprites[:walking][rand(3)].draw(scroll_x + x1, GameWindow::HEIGHT - y1, 16, 16)
+    else
+      @sprites[:standing].draw(scroll_x + x1, GameWindow::HEIGHT - y1, 16, 16)
+    end
   end
 end
