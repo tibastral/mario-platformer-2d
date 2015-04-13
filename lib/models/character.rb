@@ -7,8 +7,8 @@ end
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y
 
-  X_SIZE = 16
-  Y_SIZE = 32
+  X_SIZE = 32
+  Y_SIZE = 96
   MAX_SPEED = 5
   MAX_STEROIDS_SPEED = 10
   MAX_JUMP_MULTIPLICATOR = 1.5
@@ -21,7 +21,7 @@ class Character
   MAX_JUMPS = 2
   FROTTEMENT_TERRE = 1.10
   FROTTEMENT_AIR = 1.0005
-  WINDOW_HALF_SIZE = 256
+  WINDOW_HALF_SIZE = 128
 
   def initialize(map, options={})
     @map = map

@@ -7,8 +7,8 @@ class GameMap
       Brick.new(self, x1: -1000, x2: 20, y1: -100, y2: 100),
       Brick.new(self, x1: -1000, x2: 5000, y1: 0, y2: 10),
       Brick.new(self, x1: -1000, x2:-500, y1:0, y2:500),
-      Brick.new(self, x1: 100, x2: 1000, y1: 100, y2: 520),
-      Brick.new(self, x1: 500, x2: 520, y1: 120, y2: 300)
+      Brick.new(self, x1: 100, x2: 1000, y1: 150, y2: 520),
+      Brick.new(self, x1: 600, x2: 720, y1: 120, y2: 300)
     ]
     @enemies = [
       Enemy.new(self, x: 50, y: 200, life: 1),
@@ -17,7 +17,7 @@ class GameMap
       # Enemy.new(self, x: 10, y: 30)
     ]
     @characters = [
-      MainCharacter.new(self, x: 500, y: 26, life: 3)
+      MainCharacter.new(self, x: 500, y: 100, life: 3)
     ]
   end
 
