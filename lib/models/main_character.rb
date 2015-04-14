@@ -1,9 +1,8 @@
-
 class MainCharacter < Character
 
   def initialize(map, options)
     super(map, options)
-    @max_speed = MAX_SPEED
+    @max_speed = self.max_speed
     @color ||= Gosu::Color::RED
   end
 
@@ -86,11 +85,65 @@ class MainCharacter < Character
 
   def draw(window)
     super(window)
-    draw_string("Life: " + @life.to_s)
+    @jump_sound ||= Gosu::Sample.new(window, "media/jump.wav")
+    @right_tiles ||= Gosu::Image.load_tiles(window, 'media/mario_right.png', 7, 20, true)
+    @left_tiles ||= Gosu::Image.load_tiles(window, 'media/mario_left.png', 7, 20, true)
+    @jump_tiles ||= Gosu::Image.load_tiles(window, 'media/mario_jump.png', 7, 20, true)
+    @down_tiles ||= Gosu::Image.load_tiles(window, 'media/mario_down.png', 7, 14, true)
+
+    @sprites ||= {
+      walking: {
+        right: @right_tiles,
+        left: @left_tiles
+      },
+      standing: {
+        right: @right_tiles[3],
+        left: @left_tiles[3],
+      },
+      jumping: {
+        right: @jump_tiles[0],
+        left: @jump_tiles[1]
+      },
+      crawling: {
+        right: @down_tiles[1],
+        left: @down_tiles[0]
+      }
+    }
+
+    @facing ||= :right
+
+    @facing = right_or_left? if moving? && !jumping?
+
+    if jumping?
+      draw_jumping_animation(window)
+    elsif moving?
+      draw_walking_animation(window)
+    else
+      @sprites[:standing][@facing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+    end
+
+    draw_string('Life: ' + @life.to_s)
+  end
+
+  def draw_jumping_animation(window)
+    @sprites[:jumping][@facing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+  end
+
+  def draw_walking_animation(window)
+    @sprites[:walking][@facing][(((Time.now.to_f % 1) * 10).to_i) / 3].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
   end
 
   def draw_string(str)
     @map.window.font.draw(str, 10, 10, -10000)
+  end
+
+
+  def right_or_left?
+    if @previous_x < @x
+      :right
+    else
+      :left
+    end
   end
 
 end

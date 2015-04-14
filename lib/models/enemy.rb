@@ -1,4 +1,7 @@
 class Enemy < Character
+
+  self.y_size = 36
+
   def initialize(map, options)
     super(map, options)
     @max_speed = 1
@@ -17,5 +20,10 @@ class Enemy < Character
       end
     end
     accelerate!(@direction)
+  end
+
+  def draw(window)
+    @tile ||= Gosu::Image.load_tiles(window, 'media/ennemi.png', 7, 8, true)
+    @tile[0].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size, 1, 5, 5)
   end
 end

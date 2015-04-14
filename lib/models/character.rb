@@ -7,48 +7,53 @@ end
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y
 
-  X_SIZE = 32
-  Y_SIZE = 96
-  MAX_SPEED = 5
-  MAX_STEROIDS_SPEED = 10
-  MAX_JUMP_MULTIPLICATOR = 1.5
-  ACCELERATION = 0.4
-  GRAVITY = -1
-  JUMPING_VELOCITY = 15
-  CAN_JUMP_FOR_MS = 50
-  X_INIT = 100
-  Y_INIT = 10
-  MAX_JUMPS = 2
-  FROTTEMENT_TERRE = 1.10
-  FROTTEMENT_AIR = 1.0005
-  WINDOW_HALF_SIZE = 128
+  class_attribute :x_size, :y_size, :max_speed, :max_steroids_speed,
+    :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
+    :can_jump_for_ms, :x_init, :y_init, :max_jumps, :frottement_terre,
+    :frottement_air, :window_half_size
+
+  self.x_size = 32
+  self.y_size = 96
+  self.max_speed = 5
+  self.max_steroids_speed = 10
+  self.max_jump_multiplicator = 1.5
+  self.acceleration = 0.4
+  self.gravity = -1
+  self.jumping_velocity = 15
+  self.can_jump_for_ms = 50
+  self.x_init = 100
+  self.y_init = 10
+  self.max_jumps = 4
+  self.frottement_terre = 1.10
+  self.frottement_air = 1.0005
+  self.window_half_size = 128
 
   def initialize(map, options={})
     @map = map
-    @x = options[:x] || X_INIT
-    @y = options[:y] || Y_INIT
+    @x = options[:x] || x_init
+    @y = options[:y] || y_init
     @previous_x = nil
     @previous_y = nil
     @velocity_x = 0.0
     @velocity_y = 0.0
     @nb_jumps = 0
-    @gravity = GRAVITY
+    @gravity = gravity
     @life = options[:life]
     @dead = false
   end
 
-  def x1; @x - X_SIZE / 2; end
-  def x2; @x + X_SIZE / 2; end
-  def y1; @y - Y_SIZE / 2; end
-  def y2; @y + Y_SIZE / 2; end
+  def x1; @x - x_size / 2; end
+  def x2; @x + x_size / 2; end
+  def y1; @y - y_size / 2; end
+  def y2; @y + y_size / 2; end
 
-  def previous_x1; @previous_x - X_SIZE / 2; end
-  def previous_x2; @previous_x + X_SIZE / 2; end
-  def previous_y1; @previous_y - Y_SIZE / 2; end
-  def previous_y2; @previous_y + Y_SIZE / 2; end
+  def previous_x1; @previous_x - x_size / 2; end
+  def previous_x2; @previous_x + x_size / 2; end
+  def previous_y1; @previous_y - y_size / 2; end
+  def previous_y2; @previous_y + y_size / 2; end
 
   def scroll_x
-    WINDOW_HALF_SIZE - x1
+    window_half_size - x1
   end
 
   def collision?(object)
@@ -110,7 +115,7 @@ class Character
   end
 
   def moving?
-    @velocity_x.abs > 0.1
+    @velocity_x.abs > 0.3
   end
 
   def can_move_out_of?(object, side)
@@ -126,19 +131,19 @@ class Character
 
   def move_out_of!(object, side)
       if side == :up
-      @y = object.y2 + Y_SIZE / 2
+      @y = object.y2 + y_size / 2
     end
 
       if side == :down
-      @y = object.y1 - Y_SIZE / 2
+      @y = object.y1 - y_size / 2
     end
 
       if side == :right
-      @x = object.x2 + X_SIZE / 2
+      @x = object.x2 + x_size / 2
     end
 
       if side == :left
-      @x = object.x1 - X_SIZE / 2
+      @x = object.x1 - x_size / 2
     end
   end
 
@@ -147,21 +152,21 @@ class Character
   end
 
   def jump_multiplicator
-    @velocity_x.abs > MAX_JUMP_MULTIPLICATOR ? MAX_JUMP_MULTIPLICATOR : [@velocity_x.abs, 0.001].max
+    @velocity_x.abs > max_jump_multiplicator ? max_jump_multiplicator : [@velocity_x.abs, 0.001].max
   end
 
   def can_continue_jumping?
-    time_since_beginning_of_jump_in_ms < CAN_JUMP_FOR_MS * jump_multiplicator
+    time_since_beginning_of_jump_in_ms < can_jump_for_ms * jump_multiplicator
   end
 
   def jump!
-    if @nb_jumps < MAX_JUMPS
+    if @nb_jumps < max_jumps
       unless @begin_jump_at.present?
         @jump_sound.play
         @begin_jump_at = Gosu::milliseconds
       end
       if can_continue_jumping?
-        @velocity_y = JUMPING_VELOCITY
+        @velocity_y = jumping_velocity
       end
     end
   end
@@ -194,16 +199,16 @@ class Character
     @dead
   end
 
-  def normalSpeed!
-    @max_speed = MAX_SPEED
+  def normal_speed!
+    @max_speed = max_speed
   end
 
-  def steroidsSpeed!
-    @max_speed = MAX_STEROIDS_SPEED
+  def steroids_speed!
+    @max_speed = max_steroids_speed
   end
 
   def frottement
-    jumping? ? FROTTEMENT_AIR : FROTTEMENT_TERRE
+    jumping? ? frottement_air : frottement_terre
   end
 
   def inertia_x!
@@ -211,7 +216,7 @@ class Character
   end
 
   def accelerate!(direction)
-    @velocity_x += direction * ACCELERATION
+    @velocity_x += direction * acceleration
     if @velocity_x.abs > @max_speed
       inertia_x!
     end
@@ -219,17 +224,6 @@ class Character
 
   def draw(window)
     @window ||= window
-    @jump_sound ||= Gosu::Sample.new(window, "media/jump.wav")
-    @tileset ||= Gosu::Image.load_tiles(window, 'media/mario_try.png', 7, 20, true)
-    @sprites ||= {
-      walking: @tileset.first(3),
-      standing: @tileset[3]
-    }
-
-    if moving?
-      @sprites[:walking][rand(3)].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - 100, 1, 5, 5)
-    else
-      @sprites[:standing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - 100, 1, 5, 5)
-    end
   end
+
 end
