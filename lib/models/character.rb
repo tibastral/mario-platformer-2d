@@ -5,17 +5,13 @@ class Object
 end
 
 class Character
-  attr_accessor :x, :y, :velocity_x, :velocity_y
+  attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed
 
-  class_attribute :x_size, :y_size, :max_speed, :max_steroids_speed,
+  class_attribute :x_size, :y_size, :max_normal_speed, :max_steroids_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
     :can_jump_for_ms, :x_init, :y_init, :max_jumps, :frottement_terre,
     :frottement_air, :window_half_size
 
-  self.x_size = 32
-  self.y_size = 96
-  self.max_speed = 5
-  self.max_steroids_speed = 10
   self.max_jump_multiplicator = 1.5
   self.acceleration = 0.4
   self.gravity = -1
@@ -26,7 +22,7 @@ class Character
   self.max_jumps = 4
   self.frottement_terre = 1.10
   self.frottement_air = 1.0005
-  self.window_half_size = 128
+  self.window_half_size = 512
 
   def initialize(map, options={})
     @map = map
@@ -40,6 +36,7 @@ class Character
     @gravity = gravity
     @life = options[:life]
     @dead = false
+    @max_speed = self.max_normal_speed
   end
 
   def x1; @x - x_size / 2; end
@@ -119,7 +116,7 @@ class Character
   end
 
   def can_move_out_of?(object, side)
-    tmp_character = Character.new(nil, x: @x, y: @y)
+    tmp_character = self.class.new(nil, x: @x, y: @y)
     tmp_character.move_out_of!(object, side)
 
     collision_detected = @map.bricks.reduce(false) { | c, brick |
@@ -130,21 +127,10 @@ class Character
   end
 
   def move_out_of!(object, side)
-      if side == :up
-      @y = object.y2 + y_size / 2
-    end
-
-      if side == :down
-      @y = object.y1 - y_size / 2
-    end
-
-      if side == :right
-      @x = object.x2 + x_size / 2
-    end
-
-      if side == :left
-      @x = object.x1 - x_size / 2
-    end
+    @y = object.y2 + y_size / 2 if side == :up
+    @y = object.y1 - y_size / 2 if side == :down
+    @x = object.x2 + x_size / 2 if side == :right
+    @x = object.x1 - x_size / 2 if side == :left
   end
 
   def time_since_beginning_of_jump_in_ms
@@ -200,7 +186,7 @@ class Character
   end
 
   def normal_speed!
-    @max_speed = max_speed
+    @max_speed = max_normal_speed
   end
 
   def steroids_speed!

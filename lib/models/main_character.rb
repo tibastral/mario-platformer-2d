@@ -1,8 +1,12 @@
 class MainCharacter < Character
 
+  self.x_size = 32
+  self.y_size = 96
+  self.max_steroids_speed = 10
+  self.max_normal_speed = 5
+
   def initialize(map, options)
     super(map, options)
-    @max_speed = self.max_speed
     @color ||= Gosu::Color::RED
   end
 
@@ -131,6 +135,10 @@ class MainCharacter < Character
 
   def draw_walking_animation(window)
     @sprites[:walking][@facing][(((Time.now.to_f % 1) * 10).to_i) / 3].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+  end
+
+  def draw_crawling_animation(window)
+    @sprites[:crawling][@facing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
   end
 
   def draw_string(str)
