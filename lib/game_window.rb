@@ -38,6 +38,9 @@ class GameWindow < Hasu::Window
     if JUMP_BUTTONS.include?(id)
       @character.stop_jump!
     end
+    if [Gosu::GpLeft, Gosu::KbDown].include?(id)
+      @character.stop_crawling!
+    end
   end
 
   def draw
@@ -53,17 +56,16 @@ class GameWindow < Hasu::Window
   end
 
   def handle_direction
-    if buttons_down? STEROIDS_BUTTONS
-      @character.steroids_speed!
-    else
-      @character.normal_speed!
-    end
+    buttons_down?(STEROIDS_BUTTONS) ? @character.steroids_speed! : @character.normal_speed!
     if buttons_down? [Gosu::GpRight, Gosu::KbRight]
       @character.accelerate!(1)
     elsif buttons_down? [Gosu::GpLeft, Gosu::KbLeft]
       @character.accelerate!(-1)
     else
       @character.inertia_x!
+    end
+    if buttons_down? [Gosu::GpLeft, Gosu::KbDown]
+      @character.crawl!
     end
     @scroll_x = @character.scroll_x
   end

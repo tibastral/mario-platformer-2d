@@ -1,8 +1,10 @@
 class Enemy < Character
 
   self.x_size = 32
-  self.y_size = 36
+  self.y_size = 40
   self.max_normal_speed = 1
+  self.lifes = 1
+  self.acceleration = 0.4
 
   def initialize(map, options)
     super(map, options)

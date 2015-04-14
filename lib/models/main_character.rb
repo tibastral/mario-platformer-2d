@@ -4,6 +4,8 @@ class MainCharacter < Character
   self.y_size = 96
   self.max_steroids_speed = 10
   self.max_normal_speed = 5
+  self.lifes = 3
+  self.acceleration = 0.4
 
   def initialize(map, options)
     super(map, options)
@@ -82,9 +84,7 @@ class MainCharacter < Character
 
   def die!
     super
-    if @dead
-      @map.reset
-    end
+    @map.reset if @dead
   end
 
   def draw(window)
@@ -118,7 +118,9 @@ class MainCharacter < Character
 
     @facing = right_or_left? if moving? && !jumping?
 
-    if jumping?
+    if crawling?
+      draw_crawling_animation(window)
+    elsif jumping?
       draw_jumping_animation(window)
     elsif moving?
       draw_walking_animation(window)

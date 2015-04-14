@@ -7,13 +7,12 @@ end
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed
 
-  class_attribute :x_size, :y_size, :max_normal_speed, :max_steroids_speed,
+  class_attribute :x_size, :y_size, :lifes, :max_normal_speed, :max_steroids_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
     :can_jump_for_ms, :x_init, :y_init, :max_jumps, :frottement_terre,
     :frottement_air, :window_half_size
 
   self.max_jump_multiplicator = 1.5
-  self.acceleration = 0.4
   self.gravity = -1
   self.jumping_velocity = 15
   self.can_jump_for_ms = 50
@@ -34,9 +33,9 @@ class Character
     @velocity_y = 0.0
     @nb_jumps = 0
     @gravity = gravity
-    @life = options[:life]
     @dead = false
     @max_speed = self.max_normal_speed
+    @crawling = false
   end
 
   def x1; @x - x_size / 2; end
@@ -157,6 +156,25 @@ class Character
     end
   end
 
+  def crawl!
+    if @crawling == false
+      self.y_size = 66
+    end
+    @crawling = true
+  end
+
+  def stop_crawling!
+    if @crawling == true
+      @y += 20
+      self.y_size = 96
+    end
+    @crawling = false
+  end
+
+  def crawling?
+    @crawling == true
+  end
+
   def jumping?
     @velocity_y.abs > 0
   end
@@ -169,16 +187,12 @@ class Character
   def move_y!
     @velocity_y += @gravity
     @y += @velocity_y
-    if @y < -1000
-      die!
-    end
+    die! if @y < -1000
   end
 
   def die!
-    @life = @life - 1
-    if @life == 0
-      @dead = true
-    end
+    self.lifes -= 1
+    @dead = true if self.lifes == 0
   end
 
   def dead?

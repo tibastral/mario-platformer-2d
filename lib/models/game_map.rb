@@ -4,6 +4,7 @@ class GameMap
   def initialize(window)
     @window = window
     @bricks = [
+      Brick.new(self, x1: -10000, x2: 10000, y1: -10000, y2: 10000, color: Gosu::Color::GRAY),
       Brick.new(self, x1: -1000, x2: 20, y1: -100, y2: 100),
       Brick.new(self, x1: -1000, x2: 5000, y1: 0, y2: 10),
       Brick.new(self, x1: -1000, x2:-500, y1:0, y2:500),
