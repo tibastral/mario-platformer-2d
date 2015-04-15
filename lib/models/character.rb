@@ -14,9 +14,6 @@ class Character
 
   self.max_jump_multiplicator = 1.5
   self.gravity = -1
-  self.jumping_velocity = 15
-  self.can_jump_for_ms = 50
-  self.max_jumps = 4
   self.frottement_terre = 1.10
   self.frottement_air = 1.0005
   self.window_half_size = 512
@@ -56,6 +53,16 @@ class Character
     x1 < object.x2 &&
     y1 < object.y2 &&
     y2 > object.y1
+  end
+
+  def handle_collision_with_platform!(platform, options={})
+    came_from_up = previous_y1 >= platform.y2 if collision?(platform)
+    if came_from_up
+      @nb_jumps = 0
+      move_out_of!(platform, :up)
+      @velocity_y = 0
+      @on_the_ground = true
+    end
   end
 
   def handle_collision_with_brick!(brick, options={})
@@ -98,6 +105,12 @@ class Character
     end
   end
 
+  def handle_collisions_with_platforms!
+    @map.platforms.each do |platform|
+      handle_collision_with_platform!(platform)
+    end
+  end
+
   def move_x!
     @x += @velocity_x
   end
@@ -108,6 +121,7 @@ class Character
     move_x!
     move_y!
     handle_collisions_with_bricks!
+    handle_collisions_with_platforms!
   end
 
   def moving?
@@ -199,6 +213,10 @@ class Character
 
   def dead?
     @dead
+  end
+
+  def on_steroids?
+    @max_speed == max_steroids_speed
   end
 
   def normal_speed!

@@ -1,8 +1,11 @@
 class GameMap
-  attr_accessor :characters, :bricks, :enemies, :window
+  attr_accessor :characters, :bricks, :platforms, :enemies, :window
 
   def initialize(window)
     @window = window
+    @platforms = [
+      Platform.new(self, x1: -400, x2: -350, y1: 200, y2: 220, color: Gosu::Color::YELLOW)
+    ]
     @bricks = [
       #Brick.new(self, x1: -10000, x2: 10000, y1: -10000, y2: 10000, color: Gosu::Color::GRAY),
       Brick.new(self, x1: -1000, x2: 20, y1: -100, y2: 100),
@@ -43,6 +46,7 @@ class GameMap
     [
       @characters,
       @bricks,
+      @platforms,
       @enemies
     ].each do |collection|
       collection.map{|e| e.draw(window)}
