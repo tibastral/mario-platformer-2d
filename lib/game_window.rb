@@ -64,7 +64,7 @@ class GameWindow < Hasu::Window
     else
       @character.inertia_x!
     end
-    if buttons_down? [Gosu::GpLeft, Gosu::KbDown]
+    if buttons_down? [Gosu::GpDown, Gosu::KbDown]
       @character.crawl!
     end
     @scroll_x = @character.scroll_x

@@ -1,7 +1,8 @@
 class MainCharacter < Character
 
-  self.x_size = 32
-  self.y_size = 96
+  self.x_size = 7
+  self.y_size = 20
+  self.size_multiplier = 5
   self.max_steroids_speed = 10
   self.max_normal_speed = 5
   self.lifes = 3
@@ -125,22 +126,22 @@ class MainCharacter < Character
     elsif moving?
       draw_walking_animation(window)
     else
-      @sprites[:standing][@facing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+      draw_sprite(@sprites[:standing][@facing], window)
     end
 
     draw_string('Life: ' + @life.to_s)
   end
 
   def draw_jumping_animation(window)
-    @sprites[:jumping][@facing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+    draw_sprite(@sprites[:jumping][@facing], window)
   end
 
   def draw_walking_animation(window)
-    @sprites[:walking][@facing][(((Time.now.to_f % 1) * 10).to_i) / 3].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+    draw_sprite(@sprites[:walking][@facing][(((Time.now.to_f % 1) * 10).to_i) / 3], window)
   end
 
   def draw_crawling_animation(window)
-    @sprites[:crawling][@facing].draw(window.scroll_x + x1, GameWindow::HEIGHT - y1 - y_size - 4, 1, 5, 5)
+    draw_sprite(@sprites[:crawling][@facing], window)
   end
 
   def draw_string(str)

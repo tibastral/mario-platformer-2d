@@ -9,15 +9,13 @@ class Character
 
   class_attribute :x_size, :y_size, :lifes, :max_normal_speed, :max_steroids_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
-    :can_jump_for_ms, :x_init, :y_init, :max_jumps, :frottement_terre,
+    :can_jump_for_ms, :max_jumps, :frottement_terre, :size_multiplier,
     :frottement_air, :window_half_size
 
   self.max_jump_multiplicator = 1.5
   self.gravity = -1
   self.jumping_velocity = 15
   self.can_jump_for_ms = 50
-  self.x_init = 100
-  self.y_init = 10
   self.max_jumps = 4
   self.frottement_terre = 1.10
   self.frottement_air = 1.0005
@@ -25,8 +23,8 @@ class Character
 
   def initialize(map, options={})
     @map = map
-    @x = options[:x] || x_init
-    @y = options[:y] || y_init
+    @x = options[:x]
+    @y = options[:y]
     @previous_x = nil
     @previous_y = nil
     @velocity_x = 0.0
@@ -36,17 +34,18 @@ class Character
     @dead = false
     @max_speed = self.max_normal_speed
     @crawling = false
+    @on_the_ground = false
   end
 
-  def x1; @x - x_size / 2; end
-  def x2; @x + x_size / 2; end
-  def y1; @y - y_size / 2; end
-  def y2; @y + y_size / 2; end
+  def x1; @x - (x_size * size_multiplier) / 2; end
+  def x2; @x + (x_size * size_multiplier) / 2; end
+  def y1; @y - (y_size * size_multiplier) / 2; end
+  def y2; @y + (y_size * size_multiplier) / 2; end
 
-  def previous_x1; @previous_x - x_size / 2; end
-  def previous_x2; @previous_x + x_size / 2; end
-  def previous_y1; @previous_y - y_size / 2; end
-  def previous_y2; @previous_y + y_size / 2; end
+  def previous_x1; @previous_x - (x_size * size_multiplier) / 2; end
+  def previous_x2; @previous_x + (x_size * size_multiplier) / 2; end
+  def previous_y1; @previous_y - (y_size * size_multiplier) / 2; end
+  def previous_y2; @previous_y + (y_size * size_multiplier) / 2; end
 
   def scroll_x
     window_half_size - x1
@@ -72,6 +71,7 @@ class Character
         @nb_jumps = 0
         move_out_of!(brick, :up)
         @velocity_y = 0
+        @on_the_ground = true
       end
 
       if came_from_down
@@ -126,10 +126,10 @@ class Character
   end
 
   def move_out_of!(object, side)
-    @y = object.y2 + y_size / 2 if side == :up
-    @y = object.y1 - y_size / 2 if side == :down
-    @x = object.x2 + x_size / 2 if side == :right
-    @x = object.x1 - x_size / 2 if side == :left
+    @y = object.y2 + (y_size * size_multiplier) / 2 if side == :up
+    @y = object.y1 - (y_size * size_multiplier) / 2 if side == :down
+    @x = object.x2 + (x_size * size_multiplier) / 2 if side == :right
+    @x = object.x1 - (x_size * size_multiplier) / 2 if side == :left
   end
 
   def time_since_beginning_of_jump_in_ms
@@ -145,6 +145,7 @@ class Character
   end
 
   def jump!
+    @on_the_ground = false
     if @nb_jumps < max_jumps
       unless @begin_jump_at.present?
         @jump_sound.play
@@ -158,15 +159,16 @@ class Character
 
   def crawl!
     if @crawling == false
-      self.y_size = 66
+      @y -= 15
+      self.y_size = 14
     end
     @crawling = true
   end
 
   def stop_crawling!
     if @crawling == true
-      @y += 20
-      self.y_size = 96
+      @y += 15
+      self.y_size = 20
     end
     @crawling = false
   end
@@ -176,7 +178,7 @@ class Character
   end
 
   def jumping?
-    @velocity_y.abs > 0
+    !@on_the_ground
   end
 
   def stop_jump!
@@ -226,4 +228,7 @@ class Character
     @window ||= window
   end
 
+  def draw_sprite(sprite, window)
+    sprite.draw(window.scroll_x + x1, GameWindow::HEIGHT - y2, 1, size_multiplier, size_multiplier)
+  end
 end
