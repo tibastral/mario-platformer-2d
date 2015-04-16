@@ -1,5 +1,7 @@
 class MainCharacter < Character
 
+  ACTIONS_WITH_ANIMATION = [:walking]
+
   self.x_size = 7
   self.y_size = 20
   self.size_multiplier = 5
@@ -90,93 +92,63 @@ class MainCharacter < Character
     @map.reset if @dead
   end
 
-  def generate_sprites
+  def generate_sprites(window)
     right_tiles = Gosu::Image.load_tiles(window, 'media/mario_right.png', 7, 20, true)
     left_tiles = Gosu::Image.load_tiles(window, 'media/mario_left.png', 7, 20, true)
     jump_tiles = Gosu::Image.load_tiles(window, 'media/mario_jump.png', 7, 20, true)
     down_tiles = Gosu::Image.load_tiles(window, 'media/mario_down.png', 7, 14, true)
     {
-      walking: {
-        right: right_tiles,
-        left: left_tiles
-      },
-      standing: {
-        right: right_tiles[3],
-        left: left_tiles[3],
-      },
-      jumping: {
-        right: jump_tiles[0],
-        left: jump_tiles[1]
-      },
-      crawling: {
-        right: down_tiles[1],
-        left: down_tiles[0]
-      }
+      walking: { right: right_tiles, left: left_tiles },
+      standing: { right: right_tiles[3], left: left_tiles[3] },
+      jumping: { right: jump_tiles[0], left: jump_tiles[1] },
+      crawling: { right: down_tiles[1], left: down_tiles[0] }
     }
   end
 
   def draw(window)
     super(window)
     @jump_sound ||= Gosu::Sample.new(window, 'media/jump.wav')
-    @sprites ||= generate_sprites
+    @sprites ||= generate_sprites(window)
     @facing ||= :right
-
     @facing = right_or_left? if moving? && !jumping?
 
-    if crawling?
-      draw_crawling_animation(window)
-    elsif jumping?
-      draw_jumping_animation(window)
-    elsif moving?
-      draw_walking_animation(window)
+    case
+    when crawling?
+      draw_action(window, :crawling)
+    when jumping?
+      draw_action(window, :jumping)
+    when moving?
+      draw_action(window, :walking)
     else
-      draw_sprite(@sprites[:standing][@facing], window)
+      draw_action(window, :standing)
     end
 
     draw_string('Life: ' + self.lifes.to_s)
   end
 
-  def draw_jumping_animation(window)
-    draw_sprite(@sprites[:jumping][@facing], window)
-  end
-
-  def draw_walking_animation(window)
-    time = on_steroids? ? steroids_animation_time : animation_time
-    draw_sprite(@sprites[:walking][@facing][time], window)
-  end
-
-  def draw_crawling_animation(window)
-    draw_sprite(@sprites[:crawling][@facing], window)
+  def draw_action(window, action)
+    if ACTIONS_WITH_ANIMATION.include?(action)
+      walking_speed = on_steroids? ? 2 : 1
+      draw_sprite(@sprites[action][@facing][animation_time(walking_speed)], window)
+    else
+      draw_sprite(@sprites[action][@facing], window)
+    end
   end
 
   def draw_string(str)
     @map.window.font.draw(str, 10, 10, -10000)
   end
 
-  def animation_time
-    time = Time.now.to_f % 1 * 10
+  def animation_time(ratio = 1)
+    time = (Time.now.to_f % 1 * 10) % (10 / ratio)
     case
-    when time < 2.5
+    when time < (2.5 / ratio)
       0
-    when time >= 2.5 && time < 5
+    when time >= (2.5 / ratio) && time < (5 / ratio)
       1
-    when time >= 5 && time < 7.5
+    when time >= (5 / ratio) && time < (7.5 / ratio)
       2
-    when time >= 7.5
-      3
-    end
-  end
-
-  def steroids_animation_time
-    time = (Time.now.to_f % 1 * 10) % 5
-    case
-    when time < 1.25
-      0
-    when time >= 1.25 && time < 2.5
-      1
-    when time >= 2.5 && time < 3.75
-      2
-    when time >= 3.75
+    when time >= (7.5 / ratio)
       3
     end
   end

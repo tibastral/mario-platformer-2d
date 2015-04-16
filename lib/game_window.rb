@@ -57,6 +57,7 @@ class GameWindow < Hasu::Window
 
   def handle_direction
     buttons_down?(STEROIDS_BUTTONS) ? @character.steroids_speed! : @character.normal_speed!
+    @character.crawl_speed! if buttons_down? [Gosu::GpDown, Gosu::KbDown]
     if buttons_down? [Gosu::GpRight, Gosu::KbRight]
       @character.accelerate!(1)
     elsif buttons_down? [Gosu::GpLeft, Gosu::KbLeft]

@@ -227,6 +227,10 @@ class Character
     @max_speed = max_steroids_speed
   end
 
+  def crawl_speed!
+    @max_speed = 2
+  end
+
   def frottement
     jumping? ? frottement_air : frottement_terre
   end
