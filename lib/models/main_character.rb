@@ -7,10 +7,11 @@ class MainCharacter < Character
   self.size_multiplier = 5
   self.max_steroids_speed = 10
   self.max_normal_speed = 5
+  self.max_crawling_speed = 0.3
   self.lifes = 3
   self.acceleration = 0.4
   self.max_jumps = 2
-  self.jumping_velocity = 15
+  self.jumping_velocity = 17
   self.can_jump_for_ms = 50
 
   def initialize(map, options)
@@ -38,11 +39,12 @@ class MainCharacter < Character
         elsif enemy.can_move_out_of?(self, :down)
           enemy.move_out_of!(self, :down)
         end
-        @velocity_y = 0
+        @velocity_y = 1
         @nb_jumps = 0
         jump!
         stop_jump!
         enemy.die!
+        stop_fast_falling!
       end
 
       if came_from_down
@@ -110,12 +112,12 @@ class MainCharacter < Character
     @jump_sound ||= Gosu::Sample.new(window, 'media/jump.wav')
     @sprites ||= generate_sprites(window)
     @facing ||= :right
-    @facing = right_or_left? if moving? && !jumping?
+    @facing = right_or_left? if moving? && !in_the_air?
 
     case
     when crawling?
       draw_action(window, :crawling)
-    when jumping?
+    when in_the_air?
       draw_action(window, :jumping)
     when moving?
       draw_action(window, :walking)
@@ -136,7 +138,7 @@ class MainCharacter < Character
   end
 
   def draw_string(str)
-    @map.window.font.draw(str, 10, 10, -10000)
+    @map.window.font.draw(str, 10, 10, 10000)
   end
 
   def animation_time(ratio = 1)
@@ -154,11 +156,7 @@ class MainCharacter < Character
   end
 
   def right_or_left?
-    if @previous_x < @x
-      :right
-    else
-      :left
-    end
+    @previous_x < @x ? :right : :left
   end
 
 end

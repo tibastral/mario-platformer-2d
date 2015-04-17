@@ -7,7 +7,7 @@ end
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed
 
-  class_attribute :x_size, :y_size, :lifes, :max_normal_speed, :max_steroids_speed,
+  class_attribute :x_size, :y_size, :lifes, :max_normal_speed, :max_steroids_speed, :max_crawling_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
     :can_jump_for_ms, :max_jumps, :frottement_terre, :size_multiplier,
     :frottement_air, :window_half_size
@@ -15,7 +15,7 @@ class Character
   self.max_jump_multiplicator = 1.5
   self.gravity = -1
   self.frottement_terre = 1.10
-  self.frottement_air = 1.0005
+  self.frottement_air = 1.08
   self.window_half_size = 512
 
   def initialize(map, options={})
@@ -29,9 +29,10 @@ class Character
     @nb_jumps = 0
     @gravity = gravity
     @dead = false
-    @max_speed = self.max_normal_speed
+    @max_speed = max_normal_speed
     @crawling = false
     @on_the_ground = false
+    @fast_falling = false
   end
 
   def x1; @x - (x_size * size_multiplier) / 2; end
@@ -62,6 +63,7 @@ class Character
       move_out_of!(platform, :up)
       @velocity_y = 0
       @on_the_ground = true
+      stop_fast_falling!
     end
   end
 
@@ -79,6 +81,7 @@ class Character
         move_out_of!(brick, :up)
         @velocity_y = 0
         @on_the_ground = true
+        stop_fast_falling!
       end
 
       if came_from_down
@@ -171,10 +174,23 @@ class Character
     end
   end
 
+  def fast_fall!
+    if @previous_y && @y && @previous_y > @y
+      @gravity *= 2.5 unless @fast_falling
+      @fast_falling = true
+    end
+  end
+
+  def stop_fast_falling!
+    @gravity /= 2.5 if @fast_falling
+    @fast_falling = false
+  end
+
   def crawl!
     if @crawling == false
       @y -= 15
       self.y_size = 14
+      self.acceleration /= 4
     end
     @crawling = true
   end
@@ -183,6 +199,7 @@ class Character
     if @crawling == true
       @y += 15
       self.y_size = 20
+      self.acceleration *= 4
     end
     @crawling = false
   end
@@ -191,7 +208,7 @@ class Character
     @crawling == true
   end
 
-  def jumping?
+  def in_the_air?
     !@on_the_ground
   end
 
@@ -220,6 +237,7 @@ class Character
   end
 
   def normal_speed!
+
     @max_speed = max_normal_speed
   end
 
@@ -228,11 +246,11 @@ class Character
   end
 
   def crawl_speed!
-    @max_speed = 2
+    @max_speed = max_crawling_speed
   end
 
   def frottement
-    jumping? ? frottement_air : frottement_terre
+    in_the_air? ? frottement_air : frottement_terre
   end
 
   def inertia_x!

@@ -4,7 +4,8 @@ class GameMap
   def initialize(window)
     @window = window
     @platforms = [
-      Platform.new(self, x1: -400, x2: -350, y1: 200, y2: 220, color: Gosu::Color::YELLOW)
+      Platform.new(self, x1: -400, x2: -350, y1: 200, y2: 210, color: Gosu::Color::YELLOW),
+      Platform.new(self, x1: -300, x2: -200, y1: 350, y2: 360, color: Gosu::Color::YELLOW)
     ]
     @bricks = [
       #Brick.new(self, x1: -10000, x2: 10000, y1: -10000, y2: 10000, color: Gosu::Color::GRAY),
