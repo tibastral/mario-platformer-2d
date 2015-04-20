@@ -5,7 +5,7 @@ class Object
 end
 
 class Character
-  attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed
+  attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed, :nb_jumps, :on_the_ground, :collision_handler
 
   class_attribute :x_size, :y_size, :lifes, :max_normal_speed, :max_steroids_speed, :max_crawling_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
@@ -16,10 +16,10 @@ class Character
   self.gravity = -1
   self.frottement_terre = 1.10
   self.frottement_air = 1.08
-  self.window_half_size = 512
 
   def initialize(map, options={})
     @map = map
+    @collision_handler ||= CollisionHandler.new(map, self)
     @x = options[:x]
     @y = options[:y]
     @previous_x = nil
@@ -33,6 +33,7 @@ class Character
     @crawling = false
     @on_the_ground = false
     @fast_falling = false
+    self.window_half_size = GameWindow::WIDTH / 2
   end
 
   def x1; @x - (x_size * size_multiplier) / 2; end
@@ -56,64 +57,6 @@ class Character
     y2 > object.y1
   end
 
-  def handle_collision_with_platform!(platform, options={})
-    came_from_up = previous_y1 >= platform.y2 if collision?(platform)
-    if came_from_up
-      @nb_jumps = 0
-      move_out_of!(platform, :up)
-      @velocity_y = 0
-      @on_the_ground = true
-      stop_fast_falling!
-    end
-  end
-
-  def handle_collision_with_brick!(brick, options={})
-    if collision?(brick)
-      came_from_up     = previous_y1 >= brick.y2
-      came_from_down   = previous_y2 <= brick.y1
-      came_from_right  = previous_x1 >= brick.x2
-      came_from_left   = previous_x2 <= brick.x1
-
-      rebound_speed = options[:rebound_speed] || 0
-
-      if came_from_up
-        @nb_jumps = 0
-        move_out_of!(brick, :up)
-        @velocity_y = 0
-        @on_the_ground = true
-        stop_fast_falling!
-      end
-
-      if came_from_down
-        move_out_of!(brick, :down)
-        @velocity_y = 0
-      end
-
-      if came_from_right
-        move_out_of!(brick, :right)
-        @velocity_x = rebound_speed
-      end
-
-      if came_from_left
-        move_out_of!(brick, :left)
-        @velocity_x = -rebound_speed
-      end
-
-    end
-  end
-
-  def handle_collisions_with_bricks!
-    @map.bricks.each do |brick|
-      handle_collision_with_brick!(brick)
-    end
-  end
-
-  def handle_collisions_with_platforms!
-    @map.platforms.each do |platform|
-      handle_collision_with_platform!(platform)
-    end
-  end
-
   def move_x!
     @x += @velocity_x
   end
@@ -123,8 +66,8 @@ class Character
     @previous_y = @y
     move_x!
     move_y!
-    handle_collisions_with_bricks!
-    handle_collisions_with_platforms!
+    collision_handler.handle_collisions_with_bricks!
+    collision_handler.handle_collisions_with_platforms!
   end
 
   def moving?
@@ -163,6 +106,7 @@ class Character
 
   def jump!
     @on_the_ground = false
+    stop_fast_falling!
     if @nb_jumps < max_jumps
       unless @begin_jump_at.present?
         @jump_sound.play
@@ -237,7 +181,6 @@ class Character
   end
 
   def normal_speed!
-
     @max_speed = max_normal_speed
   end
 
