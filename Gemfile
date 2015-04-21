@@ -1,10 +1,8 @@
 source 'https://rubygems.org'
-ruby "2.2.0"
+ruby '2.2.0'
 
-gem "hasu"
-gem "pry"
-gem "cucumber"
-gem "byebug"
-gem "activesupport"
-gem "activerecord"
-gem "sinatra-activerecord"
+gem 'hasu'
+gem 'pry'
+gem 'cucumber'
+gem 'byebug'
+gem 'sinatra-activerecord'

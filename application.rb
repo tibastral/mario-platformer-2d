@@ -1,5 +1,6 @@
 require ::File.expand_path('config/boot')
 
+Hasu.load "lib/models/utils.rb"
 Hasu.load "lib/models/character.rb"
 Hasu.load "lib/models/enemy.rb"
 Hasu.load "lib/models/collision_handler.rb"

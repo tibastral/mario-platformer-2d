@@ -1,9 +1,3 @@
-class Object
-  def present?
-    !nil?
-  end
-end
-
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed, :nb_jumps, :on_the_ground, :collision_handler
 

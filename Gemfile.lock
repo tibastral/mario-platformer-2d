@@ -65,8 +65,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
-  activesupport
   byebug
   cucumber
   hasu
