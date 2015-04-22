@@ -9,7 +9,7 @@ class Character
   self.max_jump_multiplicator = 1.5
   self.gravity = -1
   self.frottement_terre = 1.10
-  self.frottement_air = 1.08
+  self.frottement_air = 1.02
 
   def initialize(map, options={})
     @map = map

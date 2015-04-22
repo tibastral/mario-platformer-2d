@@ -6,7 +6,6 @@ class CollisionHandler
     @character = character
   end
 
-
   def collision?(object)
     character.x2 > object.x1 &&
     character.x1 < object.x2 &&
