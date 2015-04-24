@@ -51,5 +51,4 @@ class Brick
       end
     end
   end
-
 end

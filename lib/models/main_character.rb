@@ -2,9 +2,10 @@ class MainCharacter < Character
 
   ACTIONS_WITH_ANIMATION = [:walking]
 
-  self.x_size = 7
-  self.y_size = 20
-  self.size_multiplier = 5
+  self.x_size = 35
+  self.y_size = 100
+  self.y_crawl_size = 14
+  self.size_multiplier = 1
   self.max_steroids_speed = 10
   self.max_normal_speed = 5
   self.max_crawling_speed = 0.3
@@ -30,10 +31,10 @@ class MainCharacter < Character
   end
 
   def generate_sprites(window)
-    right_tiles = Gosu::Image.load_tiles(window, 'media/mario_right.png', 7, 20, false)
-    left_tiles = Gosu::Image.load_tiles(window, 'media/mario_left.png', 7, 20, true)
-    jump_tiles = Gosu::Image.load_tiles(window, 'media/mario_jump.png', 7, 20, true)
-    down_tiles = Gosu::Image.load_tiles(window, 'media/mario_down.png', 7, 14, true)
+    right_tiles = Gosu::Image.load_tiles(window, 'media/main_character_right.png', x_size, y_size, false)
+    left_tiles = Gosu::Image.load_tiles(window, 'media/main_character_left.png', x_size, y_size, true)
+    jump_tiles = Gosu::Image.load_tiles(window, 'media/main_character_jump.png', x_size, y_size, true)
+    down_tiles = Gosu::Image.load_tiles(window, 'media/main_character_down.png', x_size, y_crawl_size, true)
     {
       walking: { right: right_tiles, left: left_tiles },
       standing: { right: right_tiles[3], left: left_tiles[3] },

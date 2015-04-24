@@ -1,15 +1,16 @@
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed, :nb_jumps, :on_the_ground, :collision_handler
 
-  class_attribute :x_size, :y_size, :lifes, :max_normal_speed, :max_steroids_speed, :max_crawling_speed,
+  class_attribute :x_size, :y_size, :y_crawl_size, :lifes, :max_normal_speed, :max_steroids_speed, :max_crawling_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
     :can_jump_for_ms, :max_jumps, :frottement_terre, :size_multiplier,
-    :frottement_air, :window_half_size
+    :frottement_air, :window_half_size, :fast_fall_ratio
 
   self.max_jump_multiplicator = 1.5
   self.gravity = -1
   self.frottement_terre = 1.10
   self.frottement_air = 1.02
+  self.fast_fall_ratio = 2.5
 
   def initialize(map, options={})
     @map = map
@@ -80,10 +81,16 @@ class Character
   end
 
   def move_out_of!(object, side)
-    @y = object.y2 + (y_size * size_multiplier) / 2 if side == :up
-    @y = object.y1 - (y_size * size_multiplier) / 2 if side == :down
-    @x = object.x2 + (x_size * size_multiplier) / 2 if side == :right
-    @x = object.x1 - (x_size * size_multiplier) / 2 if side == :left
+    case side
+    when :up
+      @y = object.y2 + (y_size * size_multiplier) / 2
+    when :down
+      @y = object.y1 - (y_size * size_multiplier) / 2
+    when :right
+      @x = object.x2 + (x_size * size_multiplier) / 2
+    when :left
+      @x = object.x1 - (x_size * size_multiplier) / 2
+    end
   end
 
   def time_since_beginning_of_jump_in_ms
@@ -114,19 +121,23 @@ class Character
 
   def fast_fall!
     if @previous_y && @y && @previous_y > @y
-      @gravity *= 2.5 unless @fast_falling
+      @gravity *= fast_fall_ratio unless @fast_falling
       @fast_falling = true
     end
   end
 
   def stop_fast_falling!
-    @gravity /= 2.5 if @fast_falling
+    @gravity /= fast_fall_ratio if @fast_falling
     @fast_falling = false
+  end
+
+  def y_crawl_diff
+    y_size - y_crawl_size
   end
 
   def crawl!
     if @crawling == false
-      @y -= 15
+      @y -= y_crawl_diff
       self.y_size = 14
       self.acceleration /= 4
     end

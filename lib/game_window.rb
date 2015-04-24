@@ -52,9 +52,17 @@ class GameWindow < Hasu::Window
     end
   end
 
-  def handle_direction
-    buttons_down?(STEROIDS_BUTTONS) ? @character.steroids_speed! : @character.normal_speed!
-    @character.crawl_speed! if buttons_down?(CRAWL_BUTTONS) && !@character.in_the_air?
+  def handle_max_speed
+    if buttons_down?(CRAWL_BUTTONS) && @character.on_the_ground
+      @character.crawl_speed!
+    elsif buttons_down?(STEROIDS_BUTTONS)
+      @character.steroids_speed!
+    else
+      @character.normal_speed!
+    end
+  end
+
+  def handle_acceleration
     if buttons_down? [Gosu::GpRight, Gosu::KbRight]
       @character.accelerate!(1)
     elsif buttons_down? [Gosu::GpLeft, Gosu::KbLeft]
@@ -62,9 +70,17 @@ class GameWindow < Hasu::Window
     else
       @character.inertia_x!
     end
+  end
+
+  def handle_direction
+    handle_max_speed
+    handle_acceleration
     if buttons_down?(CRAWL_BUTTONS)
-      @character.crawl! if !@character.in_the_air?
-      @character.fast_fall! if @character.in_the_air?
+      if @character.on_the_ground
+        @character.crawl!
+      else
+        @character.fast_fall!
+      end
     end
     @scroll_x = @character.scroll_x
   end
