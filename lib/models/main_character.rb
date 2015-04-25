@@ -2,9 +2,11 @@ class MainCharacter < Character
 
   ACTIONS_WITH_ANIMATION = [:walking]
 
-  self.x_size = 35
-  self.y_size = 100
-  self.y_crawl_size = 14
+  self.current_x_size = 35
+  self.current_y_size = 100
+  self.x_normal_size = 35
+  self.y_normal_size = 100
+  self.y_crawl_size = 70
   self.size_multiplier = 1
   self.max_steroids_speed = 10
   self.max_normal_speed = 5
@@ -14,6 +16,7 @@ class MainCharacter < Character
   self.max_jumps = 2
   self.jumping_velocity = 17
   self.can_jump_for_ms = 50
+  self.crawling_speed_ratio = 4
 
   def initialize(map, options)
     super(map, options)
@@ -31,10 +34,10 @@ class MainCharacter < Character
   end
 
   def generate_sprites(window)
-    right_tiles = Gosu::Image.load_tiles(window, 'media/main_character_right.png', x_size, y_size, false)
-    left_tiles = Gosu::Image.load_tiles(window, 'media/main_character_left.png', x_size, y_size, true)
-    jump_tiles = Gosu::Image.load_tiles(window, 'media/main_character_jump.png', x_size, y_size, true)
-    down_tiles = Gosu::Image.load_tiles(window, 'media/main_character_down.png', x_size, y_crawl_size, true)
+    right_tiles = Gosu::Image.load_tiles(window, 'media/main_character_right.png', current_x_size, current_y_size, false)
+    left_tiles = Gosu::Image.load_tiles(window, 'media/main_character_left.png', current_x_size, current_y_size, true)
+    jump_tiles = Gosu::Image.load_tiles(window, 'media/main_character_jump.png', current_x_size, current_y_size, true)
+    down_tiles = Gosu::Image.load_tiles(window, 'media/main_character_down.png', current_x_size, y_crawl_size, true)
     {
       walking: { right: right_tiles, left: left_tiles },
       standing: { right: right_tiles[3], left: left_tiles[3] },

@@ -1,7 +1,9 @@
 class Enemy < Character
 
-  self.x_size = 35
-  self.y_size = 40
+  self.current_x_size = 35
+  self.current_y_size = 40
+  self.x_normal_size = 35
+  self.y_normal_size = 40
   self.max_normal_speed = 1
   self.lifes = 1
   self.acceleration = 0.2
@@ -26,7 +28,7 @@ class Enemy < Character
   end
 
   def draw(window)
-    @tile ||= Gosu::Image.load_tiles(window, 'media/ennemi.png', x_size, y_size, true)
+    @tile ||= Gosu::Image.load_tiles(window, 'media/ennemi.png', current_x_size, current_y_size, true)
     draw_sprite(@tile[0], window)
   end
 end

@@ -1,10 +1,11 @@
 class Character
   attr_accessor :x, :y, :velocity_x, :velocity_y, :max_speed, :nb_jumps, :on_the_ground, :collision_handler
 
-  class_attribute :x_size, :y_size, :y_crawl_size, :lifes, :max_normal_speed, :max_steroids_speed, :max_crawling_speed,
+  class_attribute :current_x_size, :current_y_size, :y_crawl_size, :x_normal_size, :y_normal_size,
+    :lifes, :max_normal_speed, :max_steroids_speed, :max_crawling_speed,
     :max_jump_multiplicator, :acceleration, :gravity, :jumping_velocity,
     :can_jump_for_ms, :max_jumps, :frottement_terre, :size_multiplier,
-    :frottement_air, :window_half_size, :fast_fall_ratio
+    :frottement_air, :window_half_size, :fast_fall_ratio, :crawling_speed_ratio
 
   self.max_jump_multiplicator = 1.5
   self.gravity = -1
@@ -31,15 +32,15 @@ class Character
     self.window_half_size = GameWindow::WIDTH / 2
   end
 
-  def x1; @x - (x_size * size_multiplier) / 2; end
-  def x2; @x + (x_size * size_multiplier) / 2; end
-  def y1; @y - (y_size * size_multiplier) / 2; end
-  def y2; @y + (y_size * size_multiplier) / 2; end
+  def x1; @x - (current_x_size * size_multiplier) / 2; end
+  def x2; @x + (current_x_size * size_multiplier) / 2; end
+  def y1; @y - (current_y_size * size_multiplier) / 2; end
+  def y2; @y + (current_y_size * size_multiplier) / 2; end
 
-  def previous_x1; @previous_x - (x_size * size_multiplier) / 2; end
-  def previous_x2; @previous_x + (x_size * size_multiplier) / 2; end
-  def previous_y1; @previous_y - (y_size * size_multiplier) / 2; end
-  def previous_y2; @previous_y + (y_size * size_multiplier) / 2; end
+  def previous_x1; @previous_x - (current_x_size * size_multiplier) / 2; end
+  def previous_x2; @previous_x + (current_x_size * size_multiplier) / 2; end
+  def previous_y1; @previous_y - (current_y_size * size_multiplier) / 2; end
+  def previous_y2; @previous_y + (current_y_size * size_multiplier) / 2; end
 
   def scroll_x
     window_half_size - x1
@@ -83,13 +84,13 @@ class Character
   def move_out_of!(object, side)
     case side
     when :up
-      @y = object.y2 + (y_size * size_multiplier) / 2
+      @y = object.y2 + (current_y_size * size_multiplier) / 2
     when :down
-      @y = object.y1 - (y_size * size_multiplier) / 2
+      @y = object.y1 - (current_y_size * size_multiplier) / 2
     when :right
-      @x = object.x2 + (x_size * size_multiplier) / 2
+      @x = object.x2 + (current_x_size * size_multiplier) / 2
     when :left
-      @x = object.x1 - (x_size * size_multiplier) / 2
+      @x = object.x1 - (current_x_size * size_multiplier) / 2
     end
   end
 
@@ -132,23 +133,23 @@ class Character
   end
 
   def y_crawl_diff
-    y_size - y_crawl_size
+    (y_normal_size - y_crawl_size) / 2
   end
 
   def crawl!
     if @crawling == false
       @y -= y_crawl_diff
-      self.y_size = 14
-      self.acceleration /= 4
+      self.current_y_size = y_crawl_size
+      self.acceleration /= crawling_speed_ratio
     end
     @crawling = true
   end
 
   def stop_crawling!
     if @crawling == true
-      @y += 15
-      self.y_size = 20
-      self.acceleration *= 4
+      @y += y_crawl_diff
+      self.current_y_size = y_normal_size
+      self.acceleration *= crawling_speed_ratio
     end
     @crawling = false
   end
