@@ -208,9 +208,23 @@ class Character
 
   def accelerate!(direction)
     @velocity_x += direction * acceleration
-    if @velocity_x.abs > @max_speed
-      inertia_x!
-    end
+    inertia_x! if @velocity_x.abs > @max_speed
+  end
+
+  def came_from_up?(object)
+    previous_y1 >= object.y2
+  end
+
+  def came_from_down?(object)
+    previous_y2 <= object.y1
+  end
+
+  def came_from_left?(object)
+    previous_x1 >= object.x2
+  end
+
+  def came_from_right?(object)
+    previous_x2 <= object.x1
   end
 
   def draw(window)

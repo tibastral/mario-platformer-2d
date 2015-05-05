@@ -8,7 +8,7 @@ class GameMap
       Platform.new(self, x1: -300, x2: -200, y1: 350, y2: 360, color: Gosu::Color::YELLOW)
     ]
     @bricks = [
-      #Brick.new(self, x1: -10000, x2: 10000, y1: -10000, y2: 10000, color: Gosu::Color::GRAY),
+      Brick.new(self, x1: -10000, x2: 10000, y1: -10000, y2: 10000, color: Gosu::Color::GRAY),
       Brick.new(self, x1: -1004, x2: 20, y1: -100, y2: 100, texture: 'ground', texture_size_x: 32, texture_size_y: 32),
       Brick.new(self, x1: -1000, x2: 5400, y1: -22, y2: 10, texture: 'ground', texture_size_x: 32, texture_size_y: 32),
       Brick.new(self, x1: 1000, x2: 1128, y1: 0, y2: 32, texture: 'fire', texture_size_x: 32, texture_size_y: 32),

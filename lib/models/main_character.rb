@@ -8,7 +8,7 @@ class MainCharacter < Character
   self.y_normal_size = 100
   self.y_crawl_size = 70
   self.size_multiplier = 1
-  self.max_steroids_speed = 10
+  self.max_steroids_speed = 15
   self.max_normal_speed = 5
   self.max_crawling_speed = 0.3
   self.lifes = 3
