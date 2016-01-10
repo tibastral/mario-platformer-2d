@@ -38,3 +38,6 @@ DEPENDENCIES
   cucumber
   hasu
   pry
+
+BUNDLED WITH
+   1.10.3
